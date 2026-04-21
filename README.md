@@ -38,7 +38,7 @@ The app is built on a native [Tauri 2](https://tauri.app/) shell with a [Vue 3](
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/pharmacist-sabot/pdf-splitter.git
+git clone https://github.com/suradet-ps/pdf-splitter.git
 cd pdf-splitter
 
 # 2. Install frontend dependencies
