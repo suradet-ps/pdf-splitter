@@ -156,9 +156,7 @@ function onSelectClick(): void {
     flex: 1;
 }
 
-/* -----------------------------------------------------------------------
-   Drop zone container
-   --------------------------------------------------------------------- */
+/* Drop zone container */
 
 .drop-zone {
     width: 100%;
@@ -218,9 +216,7 @@ function onSelectClick(): void {
     opacity: 1;
 }
 
-/* -----------------------------------------------------------------------
-   Content
-   --------------------------------------------------------------------- */
+/* Content */
 
 .drop-zone__content {
     position: relative;
@@ -238,9 +234,7 @@ function onSelectClick(): void {
     pointer-events: auto;
 }
 
-/* -----------------------------------------------------------------------
-   Icon
-   --------------------------------------------------------------------- */
+/* Icon */
 
 .drop-zone__icon {
     color: var(--color-text-quaternary);
@@ -261,9 +255,7 @@ function onSelectClick(): void {
 .drop-zone--active .icon-body  { opacity: 0.18; }
 .drop-zone--active .icon-band  { opacity: 0.85; }
 
-/* -----------------------------------------------------------------------
-   Labels
-   --------------------------------------------------------------------- */
+/* Labels */
 
 .drop-zone__labels {
     display: flex;
@@ -294,9 +286,7 @@ function onSelectClick(): void {
     line-height: var(--leading-normal);
 }
 
-/* -----------------------------------------------------------------------
-   Button
-   --------------------------------------------------------------------- */
+/* Button */
 
 .drop-zone__btn {
     /* Inherits .btn-primary — white pill */
@@ -306,9 +296,7 @@ function onSelectClick(): void {
     min-height: 40px;
 }
 
-/* -----------------------------------------------------------------------
-   Hint text
-   --------------------------------------------------------------------- */
+/* Hint text */
 
 .drop-zone__hint {
     font-family: var(--font-sans);
