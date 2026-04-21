@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "PDF Splitter",
         "width": 720,
         "height": 560,
@@ -45,29 +46,14 @@
     ],
     "category": "Utility",
     "shortDescription": "Split PDF files into individual pages.",
-    "longDescription": "PDF Splitter is a fast, beautiful macOS desktop application that takes any multi-page PDF document and extracts each page into its own individual PDF file. Built with Tauri and Rust for maximum performance.",
+    "longDescription": "PDF Splitter is a fast, beautiful desktop application that takes any multi-page PDF document and extracts each page into its own individual PDF file. Built with Tauri and Rust for maximum performance.",
     "copyright": "Copyright © 2026 Suradet Pratomsak. MIT License.",
     "macOS": {
       "minimumSystemVersion": "12.0",
       "signingIdentity": null,
       "entitlements": null,
       "exceptionDomain": null,
-      "frameworks": [],
-      "dmg": {
-        "background": null,
-        "windowSize": {
-          "width": 660,
-          "height": 400
-        },
-        "appPosition": {
-          "x": 180,
-          "y": 170
-        },
-        "applicationFolderPosition": {
-          "x": 480,
-          "y": 170
-        }
-      }
+      "frameworks": []
     },
     "windows": {
       "digestAlgorithm": "sha256",
