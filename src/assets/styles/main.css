@@ -1,26 +1,7 @@
-/* =============================================================================
-   PDF Splitter — Shopify-Inspired Design System
-   =============================================================================
-   Design Language
-
-   • Deep teal / void-black surfaces with neon-green accent highlights.
-   • Shopify multi-layer shadow system for depth and elevation.
-   • Neon green accent (#36F4A4) used ONLY for focus rings and highlights —
-     never as a primary fill or background.
-   • System font stacks: --font-display for headings, --font-sans for body,
-     --font-mono for code and monospaced data.
-   • Fixed 720×560 Tauri window — all sizes tuned for this viewport.
-   • `prefers-reduced-motion` respected for all transitions and animations.
-   ============================================================================= */
-
-/* =============================================================================
-   CSS Custom Properties
-   ============================================================================= */
+/* CSS Custom Properties */
 
 :root {
-    /* -------------------------------------------------------------------------
-       Spacing — 8 px base unit
-       ---------------------------------------------------------------------- */
+    /* Spacing — 8 px base unit */
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
@@ -32,9 +13,7 @@
     --space-9: 40px;
     --space-10: 64px;
 
-    /* -------------------------------------------------------------------------
-       Border radius
-       ---------------------------------------------------------------------- */
+    /* Border radius */
     --radius-sm: 4px;      /* tags, badges */
     --radius-md: 8px;      /* cards, inputs */
     --radius-lg: 12px;     /* featured cards */
@@ -42,9 +21,7 @@
     --radius-2xl: 24px;
     --radius-full: 9999px; /* pill buttons — NON-NEGOTIABLE for CTAs */
 
-    /* -------------------------------------------------------------------------
-       Typography
-       ---------------------------------------------------------------------- */
+    /* Typography */
     --font-display:
         "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont,
         Arial, sans-serif;
@@ -85,34 +62,26 @@
     --tracking-wide:    0.04em;
     --tracking-wider:   0.072em;
 
-    /* -------------------------------------------------------------------------
-       Easing curves
-       ---------------------------------------------------------------------- */
+    /* Easing curves */
     --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
     --ease-in-out:  cubic-bezier(0.65, 0, 0.35, 1);
     --ease-in:      cubic-bezier(0.4, 0, 1, 1);
 
-    /* -------------------------------------------------------------------------
-       Transition durations
-       ---------------------------------------------------------------------- */
+    /* Transition durations */
     --duration-fast:   100ms;
     --duration-normal: 180ms;
     --duration-slow:   300ms;
     --duration-slower: 420ms;
 
-    /* -------------------------------------------------------------------------
-       Z-index scale
-       ---------------------------------------------------------------------- */
+    /* Z-index scale */
     --z-base:    0;
     --z-raised:  10;
     --z-overlay: 100;
     --z-modal:   200;
     --z-toast:   300;
 
-    /* -------------------------------------------------------------------------
-       Colours — Shopify-inspired dark palette
-       ---------------------------------------------------------------------- */
+    /*  Colours — Shopify-inspired dark palette */
 
     /* Root / document backgrounds */
     --color-bg:           #000000; /* Void black */
@@ -166,9 +135,7 @@
     --color-border-subtle: #101E23;
     --color-separator:     #1E2C31;
 
-    /* -------------------------------------------------------------------------
-       Shadows — Shopify multi-layer system
-       ---------------------------------------------------------------------- */
+    /* Shadows — Shopify multi-layer system */
     --shadow-sm:
         rgba(0, 0, 0, 0.10) 0px 0px 0px 1px,
         rgba(0, 0, 0, 0.12) 0px 1px 2px;
@@ -191,9 +158,7 @@
     --shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.45);
     --shadow-focus: 0px 0px 0px 2px #36F4A4;
 
-    /* -------------------------------------------------------------------------
-       Gradients
-       ---------------------------------------------------------------------- */
+    /* Gradients */
     --gradient-bg:
         radial-gradient(ellipse 120% 60% at 50% 0%, #102620 0%, #000000 70%);
     --gradient-surface:
@@ -205,23 +170,17 @@
     --gradient-progress:
         linear-gradient(90deg, #22D488 0%, #36F4A4 60%, #50F8B4 100%);
 
-    /* -------------------------------------------------------------------------
-       Blur — kept as no-ops; surfaces are sharp and opaque
-       ---------------------------------------------------------------------- */
+    /* Blur — kept as no-ops; surfaces are sharp and opaque */
     --blur-sm: blur(0px);
     --blur-md: blur(0px);
     --blur-lg: blur(0px);
     --blur-xl: blur(0px);
 
-    /* -------------------------------------------------------------------------
-       Layout
-       ---------------------------------------------------------------------- */
+    /* Layout */
     --titlebar-height: 28px;
 }
 
-/* =============================================================================
-   Box-sizing reset
-   ============================================================================= */
+/* Box-sizing reset */
 
 *,
 *::before,
@@ -231,9 +190,7 @@
     padding: 0;
 }
 
-/* =============================================================================
-   Root / document
-   ============================================================================= */
+/* Root / document */
 
 html {
     /* Atmospheric gradient pinned to the viewport regardless of scroll */
@@ -270,9 +227,7 @@ textarea,
     cursor: text;
 }
 
-/* =============================================================================
-   Typography
-   ============================================================================= */
+/* Typography */
 
 h1,
 h2,
@@ -337,9 +292,7 @@ pre {
     font-size: var(--text-sm);
 }
 
-/* =============================================================================
-   Links
-   ============================================================================= */
+/* Links */
 
 a {
     color: var(--color-accent);
@@ -352,9 +305,7 @@ a:hover {
     color: var(--color-accent-hover);
 }
 
-/* =============================================================================
-   Buttons — base reset
-   ============================================================================= */
+/* Buttons — base reset */
 
 button {
     display: inline-flex;
@@ -396,9 +347,7 @@ button:active:not(:disabled) {
     transform: scale(0.98);
 }
 
-/* -----------------------------------------------------------------------------
-   Primary — white pill CTA
-   -------------------------------------------------------------------------- */
+/* Primary — white pill CTA */
 
 .btn-primary {
     background: #FFFFFF;
@@ -423,9 +372,7 @@ button:active:not(:disabled) {
     transform: scale(0.98);
 }
 
-/* -----------------------------------------------------------------------------
-   Secondary — ghost with white border, fills on hover
-   -------------------------------------------------------------------------- */
+/* Secondary — ghost with white border, fills on hover */
 
 .btn-secondary {
     background: transparent;
@@ -444,9 +391,7 @@ button:active:not(:disabled) {
     border-color: #FFFFFF;
 }
 
-/* -----------------------------------------------------------------------------
-   Ghost — minimal, border + muted text
-   -------------------------------------------------------------------------- */
+/* Ghost — minimal, border + muted text */
 
 .btn-ghost {
     background: transparent;
@@ -464,9 +409,7 @@ button:active:not(:disabled) {
     background: var(--color-surface-hover);
 }
 
-/* -----------------------------------------------------------------------------
-   Danger — error-tinted
-   -------------------------------------------------------------------------- */
+/* Danger — error-tinted */
 
 .btn-danger {
     background: var(--color-error-subtle);
@@ -485,9 +428,7 @@ button:active:not(:disabled) {
     border-color: var(--color-error);
 }
 
-/* -----------------------------------------------------------------------------
-   Large modifier
-   -------------------------------------------------------------------------- */
+/* Large modifier */
 
 .btn-lg {
     min-height: 48px;
@@ -497,9 +438,7 @@ button:active:not(:disabled) {
     border-radius: var(--radius-full);
 }
 
-/* -----------------------------------------------------------------------------
-   Icon-only — no border, small padding, rounded
-   -------------------------------------------------------------------------- */
+/* Icon-only — no border, small padding, rounded */
 
 .btn-icon {
     padding: var(--space-2);
@@ -514,9 +453,7 @@ button:active:not(:disabled) {
     color: var(--color-text-primary);
 }
 
-/* =============================================================================
-   Cards / Surfaces
-   ============================================================================= */
+/* Cards / Surfaces */
 
 .card {
     background: var(--color-surface);
@@ -532,9 +469,7 @@ button:active:not(:disabled) {
     box-shadow: var(--shadow-lg);
 }
 
-/* =============================================================================
-   Form inputs
-   ============================================================================= */
+/* Form inputs */
 
 input[type="text"],
 input[type="search"] {
@@ -557,9 +492,7 @@ input[type="search"]:focus {
     box-shadow: var(--shadow-focus);
 }
 
-/* =============================================================================
-   Progress bar
-   ============================================================================= */
+/* Progress bar */
 
 /* Track: 3 px height, border bg, pill shape */
 .progress-track {
@@ -602,9 +535,7 @@ input[type="search"]:focus {
     100% { transform: translateX(100%); }
 }
 
-/* =============================================================================
-   Separator
-   ============================================================================= */
+/* Separator */
 
 .separator {
     height: 1px;
@@ -612,9 +543,7 @@ input[type="search"]:focus {
     margin: 0;
 }
 
-/* =============================================================================
-   Badges / Pills
-   ============================================================================= */
+/* Badges / Pills */
 
 .badge {
     display: inline-flex;
@@ -649,9 +578,7 @@ input[type="search"]:focus {
     border-color: var(--color-border);
 }
 
-/* =============================================================================
-   Tauri drag region
-   ============================================================================= */
+/* Tauri drag region */
 
 [data-tauri-drag-region] {
     -webkit-app-region: drag;
@@ -666,9 +593,7 @@ input[type="search"]:focus {
     app-region: no-drag;
 }
 
-/* =============================================================================
-   Icon sizing helpers
-   ============================================================================= */
+/* Icon sizing helpers */
 
 .icon-sm {
     width: 14px;
@@ -696,9 +621,7 @@ input[type="search"]:focus {
     flex-shrink: 0;
 }
 
-/* =============================================================================
-   Utility helpers
-   ============================================================================= */
+/* Utility helpers */
 
 .sr-only {
     position: absolute;
@@ -747,9 +670,7 @@ input[type="search"]:focus {
     font-weight: var(--weight-bold);
 }
 
-/* =============================================================================
-   View transitions — state changes between idle / ready / processing / etc.
-   ============================================================================= */
+/* View transitions — state changes between idle / ready / processing / etc. */
 
 .view-enter-active,
 .view-leave-active {
@@ -773,9 +694,7 @@ input[type="search"]:focus {
     transform: translateY(-4px);
 }
 
-/* =============================================================================
-   Fade transition
-   ============================================================================= */
+/* Fade transition */
 
 .fade-enter-active,
 .fade-leave-active {
@@ -788,9 +707,7 @@ input[type="search"]:focus {
     opacity: 0;
 }
 
-/* =============================================================================
-   Scale transition
-   ============================================================================= */
+/* Scale transition */
 
 .scale-enter-active,
 .scale-leave-active {
@@ -810,9 +727,7 @@ input[type="search"]:focus {
     transform: scale(0.97);
 }
 
-/* =============================================================================
-   List-item stagger transition
-   ============================================================================= */
+/* List-item stagger transition */
 
 .list-item-enter-active {
     transition:
@@ -826,9 +741,7 @@ input[type="search"]:focus {
     transform: translateY(8px);
 }
 
-/* =============================================================================
-   Animations
-   ============================================================================= */
+/* Animations */
 
 /* Pulse — loading indicators */
 @keyframes pulse {
@@ -891,9 +804,7 @@ input[type="search"]:focus {
     animation: terminal-enter var(--duration-normal) var(--ease-out) forwards;
 }
 
-/* =============================================================================
-   Reduced motion overrides
-   ============================================================================= */
+/* Reduced motion overrides */
 
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -910,9 +821,7 @@ input[type="search"]:focus {
     }
 }
 
-/* =============================================================================
-   Scrollbar — result list and any overflow containers
-   ============================================================================= */
+/* Scrollbar — result list and any overflow containers */
 
 ::-webkit-scrollbar {
     width: 5px;
@@ -932,9 +841,7 @@ input[type="search"]:focus {
     background: var(--color-border-strong);
 }
 
-/* =============================================================================
-   Text selection
-   ============================================================================= */
+/* Text selection */
 
 ::selection {
     background: rgba(54, 244, 164, 0.22);
