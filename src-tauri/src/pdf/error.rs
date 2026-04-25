@@ -1,4 +1,4 @@
-// Error types for the PDF processing pipeline.
+//! Error types for the PDF processing pipeline.
 
 use serde::Serialize;
 

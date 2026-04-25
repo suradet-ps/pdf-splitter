@@ -7,7 +7,7 @@ use std::{
   time::Instant,
 };
 
-use lopdf::{dictionary, Document, Object, ObjectId};
+use lopdf::{Document, Object, ObjectId, dictionary};
 
 use super::error::PdfError;
 
@@ -47,6 +47,13 @@ pub struct PageProgress {
 }
 
 /// Return the number of pages in the PDF at `path` without performing a full split.
+///
+/// # Errors
+///
+/// Returns [`PdfError::FileNotFound`] if `path` does not point to a regular file,
+/// [`PdfError::InvalidPdf`] if the file cannot be parsed as a valid PDF,
+/// [`PdfError::NoPages`] if the document contains zero pages, and
+/// [`PdfError::Internal`] if the page count overflows `u32`.
 pub fn get_page_count(path: &Path) -> Result<u32, PdfError> {
   if !path.is_file() {
     return Err(PdfError::FileNotFound {
@@ -66,6 +73,14 @@ pub fn get_page_count(path: &Path) -> Result<u32, PdfError> {
 }
 
 /// Split every page of the PDF at `request.input_path` into its own PDF file inside `request.output_dir`.
+///
+/// # Errors
+///
+/// Returns [`PdfError::FileNotFound`] if the input path does not point to a regular file,
+/// [`PdfError::InvalidPdf`] if the source file cannot be parsed as a valid PDF,
+/// [`PdfError::NoPages`] if the document contains zero pages,
+/// [`PdfError::Io`] if a filesystem operation fails (e.g. creating the output directory or
+/// writing a page file), and [`PdfError::Internal`] for unexpected internal failures.
 pub fn split_pdf<F>(request: SplitRequest, on_progress: F) -> Result<SplitResult, PdfError>
 where
   F: Fn(PageProgress) + Send + Sync,
@@ -175,7 +190,7 @@ fn build_single_page_document(
   let pages_id = new_doc.new_object_id();
 
   // Update the page's /Parent reference to point to our new Pages node
-  if let Ok(Object::Dictionary(ref mut page_dict)) = new_doc.get_object_mut(new_page_id) {
+  if let Ok(Object::Dictionary(page_dict)) = new_doc.get_object_mut(new_page_id) {
     page_dict.set("Parent", Object::Reference(pages_id));
   }
 
@@ -303,7 +318,7 @@ mod tests {
   /// pages using the lopdf API.  Panics on any internal error — this is
   /// intentional in a test context so failures surface as clear panics.
   fn make_minimal_pdf(page_count: usize) -> Vec<u8> {
-    use lopdf::{dictionary, Document, Object};
+    use lopdf::{Document, Object, dictionary};
 
     assert!(page_count > 0, "page_count must be at least 1");
 

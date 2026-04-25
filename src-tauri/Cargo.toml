@@ -1,8 +1,8 @@
 [package]
 name = "pdf-splitter"
 version = "1.0.1"
-edition = "2021"
-rust-version = "1.80"
+edition = "2024"
+rust-version = "1.95"
 description = "A fast, beautiful macOS desktop app for splitting PDF files into individual pages."
 authors = ["Suradet Pratomsak"]
 license = "MIT"

@@ -90,7 +90,7 @@ pub fn get_page_count(path: String) -> Result<u32, PdfError> {
 pub fn get_file_info(path: String) -> Result<FileInfo, PdfError> {
   let pb = PathBuf::from(path);
   let page_count = pdf::get_page_count(&pb)?;
-  let size_bytes = fs::metadata(&pb).map(|m| m.len()).unwrap_or(0);
+  let size_bytes = fs::metadata(&pb).map_or(0, |m| m.len());
   Ok(FileInfo {
     page_count,
     size_bytes,
