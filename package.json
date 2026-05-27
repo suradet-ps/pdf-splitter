@@ -1,7 +1,7 @@
 {
   "name": "pdf-splitter",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A fast, beautiful macOS desktop app for splitting PDF files into individual pages.",
   "repository": {"type":"git","url":"https://github.com/suradet-ps/pdf-splitter.git"},
   "type": "module",
