@@ -82,7 +82,7 @@ pub fn run() {
             // must guard to avoid a set_size loop.  Tauri v2 coalesces
             // repeated resize requests; the condition below only fires when
             // the window is genuinely oversized.
-            if size.width > 720_f64 || size.height > 560_f64 {
+            if size.width > 720_u32 || size.height > 560_u32 {
               let _ = win_handle.set_size(tauri::LogicalSize::new(720.0, 560.0));
             }
           }
