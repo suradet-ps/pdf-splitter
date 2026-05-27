@@ -128,7 +128,7 @@ function onDismiss(): void { emit('dismiss') }
         <!-- Try again — primary CTA -->
         <button
             type="button"
-            class="btn-primary error-actions__retry"
+            class="btn-primary btn-glow error-actions__retry"
             @click="onRetry"
         >
             <svg
@@ -230,9 +230,9 @@ function onDismiss(): void { emit('dismiss') }
    ───────────────────────────────────────────── */
 
 .error-block {
-    border: 1px solid rgba(248, 81, 73, 0.2);
+    border: 1px solid rgba(var(--color-error-rgb), 0.2);
     border-radius: var(--radius-md);
-    background: rgba(248, 81, 73, 0.05);
+    background: rgba(var(--color-error-rgb), 0.05);
     overflow: hidden;
 }
 
@@ -241,13 +241,13 @@ function onDismiss(): void { emit('dismiss') }
     display: flex;
     align-items: center;
     padding: 4px 14px;
-    background: rgba(248, 81, 73, 0.07);
-    border-bottom: 1px solid rgba(248, 81, 73, 0.14);
+    background: rgba(var(--color-error-rgb), 0.07);
+    border-bottom: 1px solid rgba(var(--color-error-rgb), 0.14);
 }
 
 .error-block__label-text {
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: var(--text-xs);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
@@ -329,25 +329,6 @@ function onDismiss(): void { emit('dismiss') }
     height: 40px;
     font-size: var(--text-md);
     gap: var(--space-2);
-    box-shadow:
-        var(--shadow-sm),
-        0 0 16px rgba(54, 244, 164, 0.10);
-    transition:
-        background var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-fast) var(--ease-out),
-        transform var(--duration-fast) var(--ease-spring);
-}
-
-.error-actions__retry:hover:not(:disabled) {
-    box-shadow:
-        var(--shadow-md),
-        0 0 24px rgba(54, 244, 164, 0.20);
-    transform: translateY(-1px);
-}
-
-.error-actions__retry:active:not(:disabled) {
-    transform: scale(0.98) translateY(0);
-    box-shadow: var(--shadow-sm);
 }
 
 /* ─────────────────────────────────────────────

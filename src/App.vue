@@ -157,10 +157,6 @@ async function onDismiss(): Promise<void> {
 </template>
 
 <style scoped>
-/* =============================================================================
-   App shell
-   ============================================================================= */
-
 .app {
     width: 720px;
     height: 560px;
@@ -170,8 +166,6 @@ async function onDismiss(): Promise<void> {
     position: relative;
     background: var(--color-bg);
 }
-
-/* Atmospheric radial glow — subtle forest-green halo at the top of the window */
 
 .app__atmosphere {
     position: absolute;
@@ -185,10 +179,6 @@ async function onDismiss(): Promise<void> {
     );
 }
 
-/* =============================================================================
-   macOS-style title bar
-   ============================================================================= */
-
 .titlebar {
     position: relative;
     height: var(--titlebar-height);
@@ -201,7 +191,6 @@ async function onDismiss(): Promise<void> {
     background: rgba(0, 0, 0, 0.4);
 }
 
-/* Spacer that matches the macOS traffic-light cluster width (~72 px) */
 .titlebar__traffic-lights {
     position: absolute;
     left: 0;
@@ -210,7 +199,7 @@ async function onDismiss(): Promise<void> {
 }
 
 .titlebar__title {
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: var(--weight-medium);
     color: var(--color-text-quaternary);
     font-family: var(--font-mono);
@@ -220,12 +209,8 @@ async function onDismiss(): Promise<void> {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    transition: color 200ms var(--ease-out);
+    transition: color var(--duration-slow) var(--ease-out);
 }
-
-/* =============================================================================
-   Main content area
-   ============================================================================= */
 
 .app__main {
     flex: 1;
@@ -238,17 +223,10 @@ async function onDismiss(): Promise<void> {
     z-index: 1;
 }
 
-/* =============================================================================
-   Wordmark — smooth show/hide without layout jump
-   ============================================================================= */
-
 .app__wordmark-wrapper {
     flex-shrink: 0;
     overflow: hidden;
-    /* Generous upper bound; actual content is ~52 px */
     max-height: 90px;
-    /* padding-bottom acts as the gap between wordmark and content area,
-       and collapses to 0 together with the wordmark height */
     padding-bottom: 20px;
     opacity: 1;
     transition:
@@ -275,7 +253,7 @@ async function onDismiss(): Promise<void> {
 .app__heading-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-1);
     min-width: 0;
 }
 
@@ -284,8 +262,8 @@ async function onDismiss(): Promise<void> {
     font-size: var(--text-3xl);
     font-weight: var(--weight-light);
     color: var(--color-text-primary);
-    line-height: 1.0;
-    letter-spacing: -0.02em;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
 }
 
 .app__subtitle {
@@ -293,12 +271,8 @@ async function onDismiss(): Promise<void> {
     font-size: var(--text-sm);
     font-weight: var(--weight-regular);
     color: var(--color-text-tertiary);
-    line-height: 1.5;
+    line-height: var(--leading-normal);
 }
-
-/* =============================================================================
-   Content container
-   ============================================================================= */
 
 .app__content {
     flex: 1;
@@ -306,12 +280,9 @@ async function onDismiss(): Promise<void> {
     flex-direction: column;
     min-height: 0;
     position: relative;
-    /* Clips absolutely-positioned views during transitions so they
-       never bleed outside the content area */
     overflow: hidden;
 }
 
-/* Individual state views */
 .view {
     display: flex;
     flex-direction: column;
@@ -319,8 +290,8 @@ async function onDismiss(): Promise<void> {
     flex: 1;
 }
 
-/* Processing card */
-.processing-card {
+.processing-card,
+.error-card {
     padding: var(--space-7);
     flex: 1;
     display: flex;
@@ -328,7 +299,6 @@ async function onDismiss(): Promise<void> {
     justify-content: center;
 }
 
-/* Result wrapper */
 .result-wrapper {
     flex: 1;
     display: flex;
@@ -345,19 +315,6 @@ async function onDismiss(): Promise<void> {
     max-height: 200px;
 }
 
-/* Error card */
-.error-card {
-    padding: var(--space-7);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-/* =============================================================================
-   Footer
-   ============================================================================= */
-
 .app__footer {
     height: 28px;
     display: flex;
@@ -369,22 +326,17 @@ async function onDismiss(): Promise<void> {
 }
 
 .app__footer-text {
-    font-size: 10px;
+    font-size: var(--text-xs);
     color: var(--color-text-quaternary);
     letter-spacing: 0.06em;
     white-space: nowrap;
     font-family: var(--font-sans);
 }
 
-/* =============================================================================
-   State-based background tints
-   Very subtle radial glows from the top, colour-coded by app state.
-   ============================================================================= */
-
 .app[data-state="processing"] {
     background-image: radial-gradient(
         ellipse 60% 30% at 50% 0%,
-        rgba(54, 244, 164, 0.05) 0%,
+        rgba(var(--color-accent-rgb), 0.05) 0%,
         transparent 100%
     );
 }
@@ -392,7 +344,7 @@ async function onDismiss(): Promise<void> {
 .app[data-state="complete"] {
     background-image: radial-gradient(
         ellipse 60% 30% at 50% 0%,
-        rgba(54, 244, 164, 0.07) 0%,
+        rgba(var(--color-accent-rgb), 0.07) 0%,
         transparent 100%
     );
 }
@@ -400,19 +352,17 @@ async function onDismiss(): Promise<void> {
 .app[data-state="error"] {
     background-image: radial-gradient(
         ellipse 60% 30% at 50% 0%,
-        rgba(248, 81, 73, 0.05) 0%,
+        rgba(var(--color-error-rgb), 0.05) 0%,
         transparent 100%
     );
 }
 
-/* Title text picks up a colour hint during active operations */
-
 .app[data-state="processing"] .titlebar__title,
 .app[data-state="complete"] .titlebar__title {
-    color: rgba(54, 244, 164, 0.6);
+    color: rgba(var(--color-accent-rgb), 0.6);
 }
 
 .app[data-state="error"] .titlebar__title {
-    color: rgba(248, 81, 73, 0.6);
+    color: rgba(var(--color-error-rgb), 0.6);
 }
 </style>

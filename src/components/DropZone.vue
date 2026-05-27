@@ -185,11 +185,11 @@ function onSelectClick(): void {
 
 /* Drag-over state */
 .drop-zone--active {
-    background: rgba(54, 244, 164, 0.03);
+    background: rgba(var(--color-accent-rgb), 0.03);
     border-color: var(--color-accent);
     box-shadow:
-        0 0 0 4px rgba(54, 244, 164, 0.08),
-        inset 0 0 60px rgba(54, 244, 164, 0.03);
+        0 0 0 4px rgba(var(--color-accent-rgb), 0.08),
+        inset 0 0 60px rgba(var(--color-accent-rgb), 0.03);
 }
 
 /* Busy state */
@@ -204,7 +204,7 @@ function onSelectClick(): void {
     inset: -80px;
     background: radial-gradient(
         ellipse at center,
-        rgba(54, 244, 164, 0.10) 0%,
+        rgba(var(--color-accent-rgb), 0.10) 0%,
         transparent 60%
     );
     opacity: 0;
@@ -300,7 +300,7 @@ function onSelectClick(): void {
 
 .drop-zone__hint {
     font-family: var(--font-sans);
-    font-size: 11px;
+    font-size: var(--text-xs);
     color: var(--color-text-quaternary);
     letter-spacing: 0.03em;
     text-align: center;

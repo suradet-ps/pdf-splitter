@@ -155,7 +155,7 @@ function onReset(): void {
         </button>
 
         <!-- "Open folder" — primary CTA -->
-        <button type="button" class="btn-primary result-actions__primary" @click="onRevealDir">
+        <button type="button" class="btn-primary btn-glow result-actions__primary" @click="onRevealDir">
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14" aria-hidden="true">
                 <path fill-rule="evenodd" clip-rule="evenodd"
                     d="M1.5 3.5A1.5 1.5 0 0 1 3 2h2.629A1.5 1.5 0 0 1 6.69 2.44L7.81 3.56A.5.5 0 0 0 8.164 3.7H13a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 13 13.7H3A1.5 1.5 0 0 1 1.5 12.2v-8.7Z"
@@ -246,9 +246,9 @@ function onReset(): void {
 .stat-chip {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
     font-family: var(--font-sans);
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: var(--weight-medium);
     letter-spacing: 0.02em;
     padding: 4px var(--space-2);
@@ -302,7 +302,7 @@ function onReset(): void {
 
 .file-list__header-label {
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: var(--text-xs);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
@@ -313,7 +313,7 @@ function onReset(): void {
 
 .file-list__header-path {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: var(--text-xs);
     color: var(--color-text-tertiary);
     flex: 1;
     min-width: 0;
@@ -382,15 +382,15 @@ function onReset(): void {
     right: var(--space-3);
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
     padding: 2px var(--space-2);
-    border: 1px solid rgba(54, 244, 164, 0.25);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.25);
     border-radius: var(--radius-sm);
     font-family: var(--font-sans);
-    font-size: 10px;
+    font-size: var(--text-xs);
     font-weight: var(--weight-medium);
     color: var(--color-accent);
-    background: rgba(54, 244, 164, 0.06);
+    background: rgba(var(--color-accent-rgb), 0.06);
     cursor: pointer;
     transition:
         background-color var(--duration-fast) var(--ease-out),
@@ -401,8 +401,8 @@ function onReset(): void {
 }
 
 .file-row__reveal:hover {
-    background: rgba(54, 244, 164, 0.12);
-    box-shadow: 0 0 8px rgba(54, 244, 164, 0.15);
+    background: rgba(var(--color-accent-rgb), 0.12);
+    box-shadow: 0 0 8px rgba(var(--color-accent-rgb), 0.15);
 }
 
 .file-row__reveal:focus-visible {
@@ -437,24 +437,5 @@ function onReset(): void {
     height: 40px;
     font-size: var(--text-md);
     gap: var(--space-2);
-    box-shadow:
-        var(--shadow-sm),
-        0 0 20px rgba(54, 244, 164, 0.12);
-    transition:
-        background var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-fast) var(--ease-out),
-        transform var(--duration-fast) var(--ease-spring);
-}
-
-.result-actions__primary:hover:not(:disabled) {
-    box-shadow:
-        var(--shadow-md),
-        0 0 28px rgba(54, 244, 164, 0.22);
-    transform: translateY(-1px);
-}
-
-.result-actions__primary:active:not(:disabled) {
-    transform: scale(0.98) translateY(0);
-    box-shadow: var(--shadow-sm);
 }
 </style>

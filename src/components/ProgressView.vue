@@ -62,7 +62,7 @@ const stepDots = computed<boolean[]>(() => {
             </template>
             <template v-else>
                 <!-- Spinning arc when processing -->
-                <svg class="progress-view__spinner" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                <svg class="progress-view__spinner animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" opacity="0.15"/>
                     <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
@@ -184,14 +184,6 @@ const stepDots = computed<boolean[]>(() => {
     color: var(--color-accent);
     margin-top: 3px;
     filter: drop-shadow(0 0 6px var(--color-accent-glow));
-}
-
-.progress-view__spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
 
 /* Title group */

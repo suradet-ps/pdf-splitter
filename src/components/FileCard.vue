@@ -126,7 +126,7 @@ function onChangeOutput(): void {
         <!-- Split button — primary CTA -->
         <button
             type="button"
-            class="btn-primary split-btn"
+            class="btn-primary btn-glow split-btn"
             :disabled="busy"
             @click="onSplit"
         >
@@ -239,7 +239,6 @@ function onChangeOutput(): void {
 .file-detail__sep {
     font-size: var(--text-xs);
     color: var(--color-text-quaternary);
-    line-height: 1;
 }
 
 /* Dismiss button */
@@ -369,32 +368,11 @@ function onChangeOutput(): void {
 
 /* Split button — white pill, black text, neon glow hint */
 .split-btn {
-    /* Inherits .btn-primary: white bg, black text, full pill */
     min-width: 140px;
     height: 42px;
     font-size: var(--text-lg);
     padding: 10px 24px 10px 20px;
     gap: var(--space-2);
-    box-shadow:
-        var(--shadow-md),
-        0 0 20px rgba(54, 244, 164, 0.10);
-    transition:
-        background var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-fast) var(--ease-out),
-        transform var(--duration-fast) var(--ease-spring),
-        opacity var(--duration-fast) var(--ease-out);
-}
-
-.split-btn:hover:not(:disabled) {
-    box-shadow:
-        var(--shadow-md),
-        0 0 28px rgba(54, 244, 164, 0.20);
-    transform: translateY(-1px);
-}
-
-.split-btn:active:not(:disabled) {
-    transform: scale(0.98) translateY(0);
-    box-shadow: var(--shadow-sm);
 }
 
 .split-btn__arrow {

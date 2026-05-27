@@ -1,0 +1,102 @@
+/* =============================================================================
+   Base — Reset, document defaults, typography, links
+   ============================================================================= */
+
+/* ── Box-sizing reset ── */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Root / document ── */
+
+html {
+    background-image: var(--gradient-bg);
+    background-attachment: fixed;
+    overflow-y: scroll;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-normal);
+    letter-spacing: var(--tracking-normal);
+    color: var(--color-text-primary);
+    background: var(--color-bg);
+    width: 720px;
+    height: 560px;
+    overflow: hidden;
+    user-select: none;
+    cursor: default;
+}
+
+/* ── Typography ── */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+h1 { font-size: var(--text-2xl); font-weight: var(--weight-light); }
+h2 { font-size: var(--text-xl);  font-weight: var(--weight-light); }
+h3 { font-size: var(--text-lg);  font-weight: var(--weight-light); }
+h4 { font-size: var(--text-md);  font-weight: var(--weight-regular); }
+h5 { font-size: var(--text-base); font-weight: var(--weight-regular); }
+h6 { font-size: var(--text-sm);  font-weight: var(--weight-regular); }
+
+p {
+    font-family: var(--font-sans);
+    line-height: var(--leading-normal);
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+small {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+}
+
+code, pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+}
+
+/* ── Links ── */
+
+a {
+    color: var(--color-accent);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+a:hover {
+    color: var(--color-accent-hover);
+}
+
+/* ── Text selection ── */
+
+input,
+textarea,
+[data-selectable] {
+    user-select: text;
+    cursor: text;
+}
+
+::selection {
+    background: rgba(54, 244, 164, 0.22);
+    color: var(--color-text-primary);
+}
