@@ -57,6 +57,40 @@ pub fn run() {
       commands::split_pdf,
       commands::reveal_in_finder,
     ])
+    // Setup
+    //
+    // Configure window behaviour that is difficult or impossible to express
+    // in the static JSON config.  Notably, on Windows the "maximise" button
+    // can still fire even with `resizable: false` in the window config; the
+    // code below catches and discards those attempts at runtime.
+    .setup(move |_app| {
+      // Force non-resizable / non-maximisable on every platform where the
+      // static JSON config might not be honoured 100 % of the time (Windows
+      // title-bar double-click, Linux WM quirks, …).
+      #[cfg(any(target_os = "windows", target_os = "linux"))]
+      {
+        use tauri::Manager;
+
+        let win = _app
+          .get_webview_window("main")
+          .expect("main window must exist");
+
+        let win_handle = win.clone();
+        win.on_window_event(move |event| {
+          if let tauri::WindowEvent::Resized(size) = event {
+            // `Resized` fires *after* the WM committed the new size, so we
+            // must guard to avoid a set_size loop.  Tauri v2 coalesces
+            // repeated resize requests; the condition below only fires when
+            // the window is genuinely oversized.
+            if size.width > 720_f64 || size.height > 560_f64 {
+              let _ = win_handle.set_size(tauri::LogicalSize::new(720.0, 560.0));
+            }
+          }
+        });
+      }
+
+      Ok(())
+    })
     // Launch
     .run(tauri::generate_context!())
     .expect("fatal: Tauri application failed to start");
