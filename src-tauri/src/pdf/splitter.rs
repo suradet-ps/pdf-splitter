@@ -659,4 +659,285 @@ mod tests {
     // is present and of the correct type.
     let _: u64 = result.elapsed_ms;
   }
+
+  /// Build a valid PDF with zero pages — used to exercise the `NoPages` error path.
+  fn make_empty_pdf() -> Vec<u8> {
+    use lopdf::{Document, Object, dictionary};
+
+    let mut doc = Document::with_version("1.7");
+    let pages_id = doc.new_object_id();
+
+    let pages = dictionary! {
+        "Type"  => "Pages",
+        "Kids"  => Object::Array(vec![]),
+        "Count" => Object::Integer(0),
+    };
+    doc.objects.insert(pages_id, Object::Dictionary(pages));
+
+    let catalog = dictionary! {
+        "Type"  => "Catalog",
+        "Pages" => Object::Reference(pages_id),
+    };
+    let catalog_id = doc.add_object(Object::Dictionary(catalog));
+    doc.trailer.set("Root", Object::Reference(catalog_id));
+
+    let mut buf = Vec::new();
+    doc
+      .save_to(&mut buf)
+      .expect("test helper: failed to serialise empty PDF");
+    buf
+  }
+
+  /// Build a PDF whose pages share a single font resource via their `/Resources`
+  /// dictionaries.  Used to verify that the deep-copy logic correctly pulls in
+  /// shared objects for each output page.
+  fn make_pdf_with_shared_font(page_count: usize) -> Vec<u8> {
+    use lopdf::{Document, Object, dictionary};
+
+    assert!(page_count > 0, "page_count must be at least 1");
+
+    let mut doc = Document::with_version("1.7");
+    let pages_id = doc.new_object_id();
+
+    let font_dict = dictionary! {
+        "Type"    => "Font",
+        "Subtype" => "Type1",
+        "BaseFont" => "Helvetica",
+    };
+    let font_id = doc.add_object(Object::Dictionary(font_dict));
+
+    let kid_refs: Vec<Object> = (0..page_count)
+      .map(|_| {
+        let font_res = dictionary! {
+            "F1" => Object::Reference(font_id),
+        };
+        let resources = dictionary! {
+            "Font" => Object::Dictionary(font_res),
+        };
+        let page = dictionary! {
+            "Type"      => "Page",
+            "Parent"    => Object::Reference(pages_id),
+            "Resources" => Object::Dictionary(resources),
+            "MediaBox"  => Object::Array(vec![
+                Object::Integer(0),
+                Object::Integer(0),
+                Object::Integer(612),
+                Object::Integer(792),
+            ]),
+        };
+        let pid = doc.add_object(Object::Dictionary(page));
+        Object::Reference(pid)
+      })
+      .collect();
+
+    let pages = dictionary! {
+        "Type"  => "Pages",
+        "Kids"  => Object::Array(kid_refs),
+        "Count" => Object::Integer(i64::try_from(page_count).expect("page_count fits i64")),
+    };
+    doc.objects.insert(pages_id, Object::Dictionary(pages));
+
+    let catalog = dictionary! {
+        "Type"  => "Catalog",
+        "Pages" => Object::Reference(pages_id),
+    };
+    let catalog_id = doc.add_object(Object::Dictionary(catalog));
+    doc.trailer.set("Root", Object::Reference(catalog_id));
+
+    let mut buf = Vec::new();
+    doc
+      .save_to(&mut buf)
+      .expect("test helper: failed to serialise PDF with shared font");
+    buf
+  }
+
+  /// Write arbitrary bytes to a temporary file inside `dir` and return its path.
+  fn write_file(dir: &tempfile::TempDir, name: &str, bytes: &[u8]) -> PathBuf {
+    let path = dir.path().join(name);
+    fs::write(&path, bytes).expect("test helper: failed to write file");
+    path
+  }
+
+  #[test]
+  fn should_return_no_pages_when_get_page_count_on_empty_pdf() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let path = write_pdf(&dir, "empty.pdf", &make_empty_pdf());
+    let result = get_page_count(&path);
+    assert!(
+      matches!(result, Err(PdfError::NoPages)),
+      "expected NoPages, got: {result:?}"
+    );
+  }
+
+  #[test]
+  fn should_return_invalid_pdf_when_get_page_count_on_corrupt_file() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let path = write_file(&dir, "corrupt.pdf", b"not a valid PDF at all");
+    let result = get_page_count(&path);
+    assert!(
+      matches!(result, Err(PdfError::InvalidPdf(_))),
+      "expected InvalidPdf, got: {result:?}"
+    );
+  }
+
+  #[test]
+  fn should_return_no_pages_when_splitting_empty_pdf() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_pdf(&dir, "source.pdf", &make_empty_pdf());
+    let out_dir = dir.path().join("none");
+
+    let result = split_pdf(
+      SplitRequest {
+        input_path: input,
+        output_dir: out_dir,
+      },
+      |_| {},
+    );
+    assert!(
+      matches!(result, Err(PdfError::NoPages)),
+      "expected NoPages, got: {result:?}"
+    );
+  }
+
+  #[test]
+  fn should_return_invalid_pdf_when_splitting_corrupt_file() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_file(&dir, "source.pdf", b"garbage bytes here");
+    let out_dir = dir.path().join("bad");
+
+    let result = split_pdf(
+      SplitRequest {
+        input_path: input,
+        output_dir: out_dir,
+      },
+      |_| {},
+    );
+    assert!(
+      matches!(result, Err(PdfError::InvalidPdf(_))),
+      "expected InvalidPdf, got: {result:?}"
+    );
+  }
+
+  #[test]
+  fn should_succeed_when_output_directory_already_exists() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(2));
+    let out_dir = dir.path().join("exists");
+
+    fs::create_dir_all(&out_dir).expect("pre-create output dir");
+
+    split_pdf(
+      SplitRequest {
+        input_path: input,
+        output_dir: out_dir,
+      },
+      |_| {},
+    )
+    .expect("split should succeed when output dir already exists");
+  }
+
+  #[test]
+  fn should_serialize_split_result_as_camelcase_json() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(1));
+    let out_dir = dir.path().join("serde");
+
+    let result = split_pdf(
+      SplitRequest {
+        input_path: input,
+        output_dir: out_dir,
+      },
+      |_| {},
+    )
+    .expect("split");
+
+    let json = serde_json::to_string(&result).expect("serialisation failed");
+    assert!(json.contains("\"totalPages\":"), "missing totalPages: {json}");
+    assert!(json.contains("\"outputFiles\":"), "missing outputFiles: {json}");
+    assert!(json.contains("\"elapsedMs\":"), "missing elapsedMs: {json}");
+  }
+
+  #[test]
+  fn should_serialize_page_progress_as_camelcase_json() {
+    let progress = PageProgress {
+      current: 3,
+      total: 10,
+      file_name: "page_0003.pdf".to_owned(),
+    };
+    let json = serde_json::to_string(&progress).expect("serialisation failed");
+    assert!(json.contains("\"current\":3"), "missing current: {json}");
+    assert!(json.contains("\"total\":10"), "missing total: {json}");
+    assert!(json.contains("\"fileName\":\"page_0003.pdf\""), "missing fileName: {json}");
+  }
+
+  #[test]
+  fn should_emit_progress_with_file_names_matching_output() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(3));
+    let out_dir = dir.path().join("names");
+
+    let log: Arc<Mutex<Vec<PageProgress>>> = Arc::new(Mutex::new(Vec::new()));
+    let log_clone = Arc::clone(&log);
+
+    let result = split_pdf(
+      SplitRequest {
+        input_path: input,
+        output_dir: out_dir,
+      },
+      move |p| {
+        log_clone.lock().expect("mutex").push(p);
+      },
+    )
+    .expect("split");
+
+    let progress_events = log.lock().expect("mutex").clone();
+
+    assert_eq!(progress_events.len(), 3);
+    for (i, event) in progress_events.iter().enumerate() {
+      let expected_name = format!("page_{:04}.pdf", i + 1);
+      assert_eq!(event.file_name, expected_name);
+    }
+
+    for event in &progress_events {
+      let path_in_result = result
+        .output_files
+        .iter()
+        .find(|p| {
+          p.file_name()
+            .map(|n| n.to_string_lossy().as_ref() == event.file_name.as_str())
+            .unwrap_or(false)
+        });
+      assert!(
+        path_in_result.is_some(),
+        "progress file name '{}' not found in output_files",
+        event.file_name
+      );
+    }
+  }
+
+  #[test]
+  fn should_preserve_shared_resources_in_output_pages() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_pdf(&dir, "source.pdf", &make_pdf_with_shared_font(2));
+    let out_dir = dir.path().join("shared");
+
+    let result = split_pdf(
+      SplitRequest {
+        input_path: input,
+        output_dir: out_dir,
+      },
+      |_| {},
+    )
+    .expect("split");
+
+    for path in &result.output_files {
+      let doc = Document::load(path).expect("output should be loadable");
+      assert_eq!(doc.get_pages().len(), 1);
+      assert!(
+        doc.objects.len() >= 4,
+        "expected >= 4 objects (catalog, pages, page, font) in {path:?}, got {}",
+        doc.objects.len()
+      );
+    }
+  }
 }

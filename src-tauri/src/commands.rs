@@ -254,4 +254,71 @@ mod tests {
     assert_eq!(EVENT_SPLIT_PROGRESS, "split://progress");
     assert_eq!(EVENT_SPLIT_COMPLETE, "split://complete");
   }
+
+  /// Write a minimal PDF to a temporary file and return its path.
+  fn write_test_pdf(dir: &tempfile::TempDir, name: &str, bytes: &[u8]) -> PathBuf {
+    let path = dir.path().join(name);
+    std::fs::write(&path, bytes).expect("test helper: failed to write PDF");
+    path
+  }
+
+  /// Build a minimal 1-page PDF as bytes.
+  fn make_one_page_pdf() -> Vec<u8> {
+    use lopdf::{Document, Object, dictionary};
+
+    let mut doc = Document::with_version("1.7");
+    let pages_id = doc.new_object_id();
+    let page = dictionary! {
+        "Type"      => "Page",
+        "Parent"    => Object::Reference(pages_id),
+        "MediaBox"  => Object::Array(vec![
+            Object::Integer(0),
+            Object::Integer(0),
+            Object::Integer(612),
+            Object::Integer(792),
+        ]),
+    };
+    let page_id = doc.add_object(Object::Dictionary(page));
+    let pages = dictionary! {
+        "Type"  => "Pages",
+        "Kids"  => Object::Array(vec![Object::Reference(page_id)]),
+        "Count" => Object::Integer(1),
+    };
+    doc.objects.insert(pages_id, Object::Dictionary(pages));
+    let catalog = dictionary! {
+        "Type"  => "Catalog",
+        "Pages" => Object::Reference(pages_id),
+    };
+    let catalog_id = doc.add_object(Object::Dictionary(catalog));
+    doc.trailer.set("Root", Object::Reference(catalog_id));
+
+    let mut buf = Vec::new();
+    doc
+      .save_to(&mut buf)
+      .expect("test helper: failed to serialise PDF");
+    buf
+  }
+
+  #[test]
+  fn should_get_file_info_return_page_count_and_size_bytes() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let pdf_bytes = make_one_page_pdf();
+    let path = write_test_pdf(&dir, "test.pdf", &pdf_bytes);
+
+    let info = get_file_info(path.to_string_lossy().into_owned()).expect("get_file_info");
+
+    assert_eq!(info.page_count, 1);
+    assert_eq!(info.size_bytes, pdf_bytes.len() as u64);
+  }
+
+  #[test]
+  fn should_serialize_file_info_as_camelcase_json() {
+    let info = FileInfo {
+      page_count: 5,
+      size_bytes: 1024,
+    };
+    let json = serde_json::to_string(&info).expect("serialisation failed");
+    assert!(json.contains("\"pageCount\":5"), "missing pageCount: {json}");
+    assert!(json.contains("\"sizeBytes\":1024"), "missing sizeBytes: {json}");
+  }
 }

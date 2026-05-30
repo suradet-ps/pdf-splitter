@@ -110,4 +110,37 @@ mod tests {
     assert_eq!(PdfError::NoPages.kind_str(), "NoPages");
     assert_eq!(PdfError::Internal(String::new()).kind_str(), "Internal");
   }
+
+  #[test]
+  fn should_serialize_io_variant_with_kind_and_message() {
+    let err = PdfError::Io(std::io::Error::new(
+      std::io::ErrorKind::NotFound,
+      "disk not found",
+    ));
+    let json = serde_json::to_string(&err).expect("serialisation failed");
+    assert!(json.contains("\"kind\":\"Io\""), "missing Io kind: {json}");
+    assert!(json.contains("\"message\""), "missing message key: {json}");
+  }
+
+  #[test]
+  fn should_return_io_kind_str() {
+    let err = PdfError::Io(std::io::Error::new(std::io::ErrorKind::Other, ""));
+    assert_eq!(err.kind_str(), "Io");
+  }
+
+  #[test]
+  fn should_convert_io_error_via_from_trait() {
+    let io_err = std::io::Error::new(std::io::ErrorKind::UnexpectedEof, "truncated");
+    let pdf_err: PdfError = io_err.into();
+    assert!(matches!(pdf_err, PdfError::Io(_)));
+  }
+
+  #[test]
+  fn should_convert_str_ref_to_internal_via_from_trait() {
+    let err: PdfError = "something broke".into();
+    let PdfError::Internal(msg) = err else {
+      panic!("expected Internal variant, got: {err:?}");
+    };
+    assert_eq!(msg, "something broke");
+  }
 }
