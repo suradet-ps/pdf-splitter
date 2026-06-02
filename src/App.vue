@@ -1,60 +1,62 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { usePdfSplitter } from '@/composables/usePdfSplitter'
-import DropZone from '@/components/DropZone.vue'
-import FileCard from '@/components/FileCard.vue'
-import ProgressView from '@/components/ProgressView.vue'
-import ResultView from '@/components/ResultView.vue'
-import ErrorView from '@/components/ErrorView.vue'
+import { computed } from 'vue';
+import DropZone from '@/components/DropZone.vue';
+import ErrorView from '@/components/ErrorView.vue';
+import FileCard from '@/components/FileCard.vue';
+import ProgressView from '@/components/ProgressView.vue';
+import ResultView from '@/components/ResultView.vue';
+import { usePdfSplitter } from '@/composables/usePdfSplitter';
 
 const {
-    state,
-    fileInfo,
-    outputDir,
-    operation,
-    result,
-    error,
-    isBusy,
-    fileSizeFormatted,
-    progressPercent,
-    elapsedFormatted,
-    outputDirShort,
-    pickFile,
-    pickOutputDir,
-    startSplit,
-    revealOutput,
-    reset,
-} = usePdfSplitter()
-
+  state,
+  fileInfo,
+  outputDir,
+  operation,
+  result,
+  error,
+  isBusy,
+  fileSizeFormatted,
+  progressPercent,
+  elapsedFormatted,
+  outputDirShort,
+  pickFile,
+  pickOutputDir,
+  startSplit,
+  revealOutput,
+  reset,
+} = usePdfSplitter();
 
 const windowTitle = computed<string>(() => {
-    switch (state.value) {
-        case 'idle': return '~/pdf-splitter'
-        case 'ready': return `~/pdf-splitter — ${fileInfo.value?.name ?? ''}`
-        case 'processing': return `splitting… ${progressPercent.value}%`
-        case 'complete': return `done — ${result.value?.totalPages ?? 0} pages`
-        case 'error': return '~/pdf-splitter — error'
-        default: return '~/pdf-splitter'
-    }
-})
+  switch (state.value) {
+    case 'idle':
+      return '~/pdf-splitter';
+    case 'ready':
+      return `~/pdf-splitter — ${fileInfo.value?.name ?? ''}`;
+    case 'processing':
+      return `splitting… ${progressPercent.value}%`;
+    case 'complete':
+      return `done — ${result.value?.totalPages ?? 0} pages`;
+    case 'error':
+      return '~/pdf-splitter — error';
+    default:
+      return '~/pdf-splitter';
+  }
+});
 
-const showSubtitle = computed<boolean>(
-    () => state.value === 'idle' || state.value === 'ready',
-)
-
+const showSubtitle = computed<boolean>(() => state.value === 'idle' || state.value === 'ready');
 
 async function onDrop(path: string): Promise<void> {
-    void path
-    await pickFile()
+  void path;
+  await pickFile();
 }
 
 async function onRetry(): Promise<void> {
-    await reset()
-    await pickFile()
+  await reset();
+  await pickFile();
 }
 
 async function onDismiss(): Promise<void> {
-    await reset()
+  await reset();
 }
 </script>
 

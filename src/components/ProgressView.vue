@@ -1,46 +1,40 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-    /* Progress percentage (0–100) */
-    percent: number
-    /* Pages completed so far (1-based) */
-    current: number
-    /* Total pages to process */
-    total: number
-    /* Filename of the most-recently written output page */
-    currentFile: string
-    /* Basename of the source PDF file */
-    fileName: string
-}>()
+  /* Progress percentage (0–100) */
+  percent: number;
+  /* Pages completed so far (1-based) */
+  current: number;
+  /* Total pages to process */
+  total: number;
+  /* Filename of the most-recently written output page */
+  currentFile: string;
+  /* Basename of the source PDF file */
+  fileName: string;
+}>();
 
-const clampedPercent = computed<number>(() =>
-    Math.min(100, Math.max(0, props.percent)),
-)
+const clampedPercent = computed<number>(() => Math.min(100, Math.max(0, props.percent)));
 
-const fillTransform = computed<string>(() =>
-    `scaleX(${clampedPercent.value / 100})`,
-)
+const fillTransform = computed<string>(() => `scaleX(${clampedPercent.value / 100})`);
 
 const fractionLabel = computed<string>(() =>
-    props.total > 0 ? `${props.current} / ${props.total}` : '…',
-)
+  props.total > 0 ? `${props.current} / ${props.total}` : '…',
+);
 
-const isStarting = computed<boolean>(() => props.current === 0)
+const isStarting = computed<boolean>(() => props.current === 0);
 
-const isFinalising = computed<boolean>(
-    () => clampedPercent.value >= 100 && !isStarting.value,
-)
+const isFinalising = computed<boolean>(() => clampedPercent.value >= 100 && !isStarting.value);
 
-const MAX_DOTS = 20
+const MAX_DOTS = 20;
 const stepDots = computed<boolean[]>(() => {
-    if (props.total <= 0) return []
-    const count = Math.min(props.total, MAX_DOTS)
-    return Array.from({ length: count }, (_, i) => {
-        const threshold = Math.round(((i + 1) / count) * props.total)
-        return props.current >= threshold
-    })
-})
+  if (props.total <= 0) return [];
+  const count = Math.min(props.total, MAX_DOTS);
+  return Array.from({ length: count }, (_, i) => {
+    const threshold = Math.round(((i + 1) / count) * props.total);
+    return props.current >= threshold;
+  });
+});
 </script>
 
 <template>

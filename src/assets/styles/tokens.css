@@ -4,321 +4,310 @@
    ============================================================================= */
 
 :root {
-    /* ── Spacing (8px base unit) ── */
-    --space-1: 4px;
-    --space-2: 8px;
-    --space-3: 12px;
-    --space-4: 16px;
-    --space-5: 24px;
-    --space-6: 28px;
-    --space-7: 32px;
-    --space-8: 36px;
-    --space-9: 40px;
-    --space-10: 64px;
+  /* ── Spacing (8px base unit) ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 28px;
+  --space-7: 32px;
+  --space-8: 36px;
+  --space-9: 40px;
+  --space-10: 64px;
 
-    /* ── Border radius ── */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 20px;
-    --radius-2xl: 24px;
-    --radius-full: 9999px;
+  /* ── Border radius ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
 
-    /* ── Typography (primitives) ── */
-    --font-display:
-        "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont,
-        Arial, sans-serif;
-    --font-sans:
-        -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI",
-        Arial, sans-serif;
-    --font-mono:
-        ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas,
-        "Liberation Mono", "Courier New", monospace;
+  /* ── Typography (primitives) ── */
+  --font-display: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 
-    --text-xs:   10px;
-    --text-sm:   12px;
-    --text-base: 13px;
-    --text-md:   14px;
-    --text-lg:   15px;
-    --text-xl:   17px;
-    --text-2xl:  20px;
-    --text-3xl:  26px;
-    --text-4xl:  34px;
+  --text-xs: 10px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 15px;
+  --text-xl: 17px;
+  --text-2xl: 20px;
+  --text-3xl: 26px;
+  --text-4xl: 34px;
 
-    --weight-light:    300;
-    --weight-regular:  400;
-    --weight-medium:   500;
-    --weight-semibold: 600;
-    --weight-bold:     700;
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
 
-    --leading-tight:   1.0;
-    --leading-snug:    1.14;
-    --leading-normal:  1.5;
-    --leading-relaxed: 1.56;
+  --leading-tight: 1;
+  --leading-snug: 1.14;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.56;
 
-    --tracking-tight:  -0.02em;
-    --tracking-normal:  0em;
-    --tracking-wide:    0.04em;
-    --tracking-wider:   0.072em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.072em;
 
-    /* ── Motion ── */
-    --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
-    --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
-    --ease-in-out:  cubic-bezier(0.65, 0, 0.35, 1);
-    --ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  /* ── Motion ── */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
 
-    --duration-fast:   100ms;
-    --duration-normal: 180ms;
-    --duration-slow:   300ms;
-    --duration-slower: 420ms;
+  --duration-fast: 100ms;
+  --duration-normal: 180ms;
+  --duration-slow: 300ms;
+  --duration-slower: 420ms;
 
-    /* Loop durations (for infinite keyframe animations) */
-    --duration-pulse:   2000ms;
-    --duration-spin:    1000ms;
-    --duration-blink:   1100ms;
-    --duration-shimmer: 1800ms;
-    --duration-float:   3800ms;
+  /* Loop durations (for infinite keyframe animations) */
+  --duration-pulse: 2000ms;
+  --duration-spin: 1000ms;
+  --duration-blink: 1100ms;
+  --duration-shimmer: 1800ms;
+  --duration-float: 3800ms;
 
-    /* ── Z-index ── */
-    --z-base:    0;
-    --z-raised:  10;
-    --z-overlay: 100;
-    --z-modal:   200;
-    --z-toast:   300;
+  /* ── Z-index ── */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-overlay: 100;
+  --z-modal: 200;
+  --z-toast: 300;
 
-    /* ── Borders ── */
-    --border-thin:  1px;
-    --border-thick: 2px;
+  /* ── Borders ── */
+  --border-thin: 1px;
+  --border-thick: 2px;
 
-    /* ── Opacity ── */
-    --opacity-disabled: 0.4;
-    --opacity-busy:    0.6;
-    --opacity-pulse-mid: 0.45;
-    --opacity-shimmer: 0.35;
-    --opacity-icon-faint:  0.05;
-    --opacity-icon-soft:   0.10;
-    --opacity-icon-subtle: 0.12;
-    --opacity-icon-medium: 0.18;
-    --opacity-icon-line:   0.70;
-    --opacity-icon-strong: 0.85;
-    --opacity-error-label: 0.65;
-    --opacity-error-prefix: 0.75;
-    --opacity-error-soft:  0.14;
-    --opacity-backdrop-strong: 0.4;
-    --opacity-backdrop-medium: 0.3;
-    --opacity-hover-white:     0.9;
-    --opacity-border-soft:     0.7;
-    --alpha-soft:             0.05;
-    --alpha-medium:           0.07;
-    --alpha-strong:           0.20;
-    --alpha-border:           0.25;
+  /* ── Opacity ── */
+  --opacity-disabled: 0.4;
+  --opacity-busy: 0.6;
+  --opacity-pulse-mid: 0.45;
+  --opacity-shimmer: 0.35;
+  --opacity-icon-faint: 0.05;
+  --opacity-icon-soft: 0.1;
+  --opacity-icon-subtle: 0.12;
+  --opacity-icon-medium: 0.18;
+  --opacity-icon-line: 0.7;
+  --opacity-icon-strong: 0.85;
+  --opacity-error-label: 0.65;
+  --opacity-error-prefix: 0.75;
+  --opacity-error-soft: 0.14;
+  --opacity-backdrop-strong: 0.4;
+  --opacity-backdrop-medium: 0.3;
+  --opacity-hover-white: 0.9;
+  --opacity-border-soft: 0.7;
+  --alpha-soft: 0.05;
+  --alpha-medium: 0.07;
+  --alpha-strong: 0.2;
+  --alpha-border: 0.25;
 
-    /* ── Scale (component micro-interactions) ── */
-    --scale-press:  0.98;
-    --scale-enter:  0.94;
-    --scale-leave:  0.97;
-    --scale-pop-1:  1.12;
-    --scale-pop-2:  0.96;
-    --scale-error-1: 0.5;
-    --scale-error-2: 1.15;
+  /* ── Scale (component micro-interactions) ── */
+  --scale-press: 0.98;
+  --scale-enter: 0.94;
+  --scale-leave: 0.97;
+  --scale-pop-1: 1.12;
+  --scale-pop-2: 0.96;
+  --scale-error-1: 0.5;
+  --scale-error-2: 1.15;
 
-    /* ── Colors: primitive ── */
-    --color-black: #000000;
-    --color-white: #FFFFFF;
+  /* ── Colors: primitive ── */
+  --color-black: #000000;
+  --color-white: #ffffff;
 
-    /* RGB variants (for rgba() usage in components) */
-    --color-accent-rgb:        54, 244, 164;
-    --color-accent-hover-rgb:  80, 248, 180;
-    --color-accent-active-rgb: 34, 212, 136;
-    --color-white-rgb:         255, 255, 255;
-    --color-black-rgb:         0, 0, 0;
-    --color-error-rgb:         248, 81, 73;
-    --color-success-rgb:       54, 244, 164;
+  /* RGB variants (for rgba() usage in components) */
+  --color-accent-rgb: 54, 244, 164;
+  --color-accent-hover-rgb: 80, 248, 180;
+  --color-accent-active-rgb: 34, 212, 136;
+  --color-white-rgb: 255, 255, 255;
+  --color-black-rgb: 0, 0, 0;
+  --color-error-rgb: 248, 81, 73;
+  --color-success-rgb: 54, 244, 164;
 
-    /* ── Colors: backgrounds ── */
-    --color-bg:           #000000;
-    --color-bg-secondary: #02090A;
-    --color-bg-tertiary:  #061A1C;
+  /* ── Colors: backgrounds ── */
+  --color-bg: #000000;
+  --color-bg-secondary: #02090a;
+  --color-bg-tertiary: #061a1c;
 
-    /* ── Colors: surfaces ── */
-    --color-surface:          #02090A;
-    --color-surface-raised:   #061A1C;
-    --color-surface-elevated: #102620;
-    --color-surface-inset:    rgba(0, 0, 0, 0.35);
-    --color-surface-hover:    rgba(255, 255, 255, 0.035);
-    --color-surface-overlay:  rgba(2, 9, 10, 0.97);
+  /* ── Colors: surfaces ── */
+  --color-surface: #02090a;
+  --color-surface-raised: #061a1c;
+  --color-surface-elevated: #102620;
+  --color-surface-inset: rgba(0, 0, 0, 0.35);
+  --color-surface-hover: rgba(255, 255, 255, 0.035);
+  --color-surface-overlay: rgba(2, 9, 10, 0.97);
 
-    /* ── Colors: text ── */
-    --color-text-primary:    #FFFFFF;
-    --color-text-secondary:  #A1A1AA;
-    --color-text-tertiary:   #71717A;
-    --color-text-quaternary: #52525B;
-    --color-text-on-accent:  #000000;
+  /* ── Colors: text ── */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+  --color-text-quaternary: #52525b;
+  --color-text-on-accent: #000000;
 
-    /* ── Colors: accent ── */
-    --color-accent:        #36F4A4;
-    --color-accent-hover:  #50F8B4;
-    --color-accent-active: #22D488;
-    --color-accent-subtle: rgba(54, 244, 164, 0.08);
-    --color-accent-glow:   rgba(54, 244, 164, 0.20);
+  /* ── Colors: accent ── */
+  --color-accent: #36f4a4;
+  --color-accent-hover: #50f8b4;
+  --color-accent-active: #22d488;
+  --color-accent-subtle: rgba(54, 244, 164, 0.08);
+  --color-accent-glow: rgba(54, 244, 164, 0.2);
 
-    /* ── Colors: semantic — success ── */
-    --color-success:        #36F4A4;
-    --color-success-subtle: rgba(54, 244, 164, 0.08);
-    --color-success-text:   #36F4A4;
+  /* ── Colors: semantic — success ── */
+  --color-success: #36f4a4;
+  --color-success-subtle: rgba(54, 244, 164, 0.08);
+  --color-success-text: #36f4a4;
 
-    /* ── Colors: semantic — error ── */
-    --color-error:        #F85149;
-    --color-error-subtle: rgba(248, 81, 73, 0.08);
-    --color-error-text:   #FF7B72;
+  /* ── Colors: semantic — error ── */
+  --color-error: #f85149;
+  --color-error-subtle: rgba(248, 81, 73, 0.08);
+  --color-error-text: #ff7b72;
 
-    /* ── Colors: semantic — warning ── */
-    --color-warning:        #F4A136;
-    --color-warning-subtle: rgba(244, 161, 54, 0.1);
-    --color-warning-text:   #F4C36C;
+  /* ── Colors: semantic — warning ── */
+  --color-warning: #f4a136;
+  --color-warning-subtle: rgba(244, 161, 54, 0.1);
+  --color-warning-text: #f4c36c;
 
-    /* ── Colors: semantic — info ── */
-    --color-info:        #58a6ff;
-    --color-info-subtle: rgba(88, 166, 255, 0.1);
+  /* ── Colors: semantic — info ── */
+  --color-info: #58a6ff;
+  --color-info-subtle: rgba(88, 166, 255, 0.1);
 
-    /* ── Colors: borders ── */
-    --color-border:        #1E2C31;
-    --color-border-strong: #2A3D44;
-    --color-border-subtle: #101E23;
-    --color-separator:     #1E2C31;
+  /* ── Colors: borders ── */
+  --color-border: #1e2c31;
+  --color-border-strong: #2a3d44;
+  --color-border-subtle: #101e23;
+  --color-separator: #1e2c31;
 
-    /* ── Shadows ── */
-    --shadow-sm:
-        rgba(0, 0, 0, 0.10) 0px 0px 0px 1px,
-        rgba(0, 0, 0, 0.12) 0px 1px 2px;
+  /* ── Shadows ── */
+  --shadow-sm: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.12) 0px 1px 2px;
 
-    --shadow-md:
-        rgba(0, 0, 0, 0.10) 0px 0px 0px 1px,
-        rgba(0, 0, 0, 0.10) 0px 2px 2px,
-        rgba(0, 0, 0, 0.10) 0px 4px 4px,
-        rgba(0, 0, 0, 0.10) 0px 8px 8px,
-        rgba(255, 255, 255, 0.03) 0px 1px 0px inset;
+  --shadow-md:
+    rgba(0, 0, 0, 0.1) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.1) 0px 2px 2px,
+    rgba(0, 0, 0, 0.1) 0px 4px 4px,
+    rgba(0, 0, 0, 0.1) 0px 8px 8px,
+    rgba(255, 255, 255, 0.03) 0px 1px 0px inset;
 
-    --shadow-lg:
-        rgba(0, 0, 0, 0.15) 0px 0px 0px 1px,
-        rgba(0, 0, 0, 0.15) 0px 4px 8px,
-        rgba(0, 0, 0, 0.12) 0px 8px 16px,
-        rgba(0, 0, 0, 0.10) 0px 16px 32px,
-        rgba(255, 255, 255, 0.04) 0px 1px 0px inset;
+  --shadow-lg:
+    rgba(0, 0, 0, 0.15) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.15) 0px 4px 8px,
+    rgba(0, 0, 0, 0.12) 0px 8px 16px,
+    rgba(0, 0, 0, 0.1) 0px 16px 32px,
+    rgba(255, 255, 255, 0.04) 0px 1px 0px inset;
 
-    --shadow-xl:     rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
-    --shadow-inset:  inset 0 1px 3px rgba(0, 0, 0, 0.45);
-    --shadow-focus:  0px 0px 0px 2px #36F4A4;
+  --shadow-xl: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
+  --shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-focus: 0px 0px 0px 2px #36f4a4;
 
-    /* Glow shadow tokens (reusable neon hover effect) */
-    --shadow-glow-sm: 0 0 16px rgba(54, 244, 164, 0.10);
-    --shadow-glow-md: 0 0 20px rgba(54, 244, 164, 0.12);
-    --shadow-glow-lg: 0 0 28px rgba(54, 244, 164, 0.22);
+  /* Glow shadow tokens (reusable neon hover effect) */
+  --shadow-glow-sm: 0 0 16px rgba(54, 244, 164, 0.1);
+  --shadow-glow-md: 0 0 20px rgba(54, 244, 164, 0.12);
+  --shadow-glow-lg: 0 0 28px rgba(54, 244, 164, 0.22);
 
-    /* ── Gradients ── */
-    --gradient-bg:
-        radial-gradient(ellipse 120% 60% at 50% 0%, #102620 0%, #000000 70%);
-    --gradient-surface:
-        linear-gradient(160deg, #061A1C 0%, #02090A 100%);
-    --gradient-accent:
-        linear-gradient(135deg, #22D488 0%, #36F4A4 100%);
-    --gradient-success:
-        linear-gradient(135deg, #22D488 0%, #36F4A4 100%);
-    --gradient-progress:
-        linear-gradient(90deg, #22D488 0%, #36F4A4 60%, #50F8B4 100%);
+  /* ── Gradients ── */
+  --gradient-bg: radial-gradient(ellipse 120% 60% at 50% 0%, #102620 0%, #000000 70%);
+  --gradient-surface: linear-gradient(160deg, #061a1c 0%, #02090a 100%);
+  --gradient-accent: linear-gradient(135deg, #22d488 0%, #36f4a4 100%);
+  --gradient-success: linear-gradient(135deg, #22d488 0%, #36f4a4 100%);
+  --gradient-progress: linear-gradient(90deg, #22d488 0%, #36f4a4 60%, #50f8b4 100%);
 
-    /* ── Layout ── */
-    --titlebar-height: 28px;
+  /* ── Layout ── */
+  --titlebar-height: 28px;
 
-    /* App window dimensions (Tauri) */
-    --size-app-width:  720px;
-    --size-app-height: 560px;
+  /* App window dimensions (Tauri) */
+  --size-app-width: 720px;
+  --size-app-height: 560px;
 
-    /* Minimum touch target (WCAG AAA) */
-    --size-touch-min: 48px;
+  /* Minimum touch target (WCAG AAA) */
+  --size-touch-min: 48px;
 
-    /* Progress bar track height */
-    --size-progress-track: 3px;
+  /* Progress bar track height */
+  --size-progress-track: 3px;
 
-    /* Scrollbar thickness */
-    --size-scrollbar: 5px;
+  /* Scrollbar thickness */
+  --size-scrollbar: 5px;
 
-    /* Icon sizes */
-    --size-icon-sm:  14px;
-    --size-icon-md:  18px;
-    --size-icon-lg:  24px;
-    --size-icon-xl:  32px;
-    --size-icon-2xl: 48px;
+  /* Icon sizes */
+  --size-icon-sm: 14px;
+  --size-icon-md: 18px;
+  --size-icon-lg: 24px;
+  --size-icon-xl: 32px;
+  --size-icon-2xl: 48px;
 
-    /* Button padding (asymmetric pill pattern from design system) */
-    --space-button-y:      10px;
-    --space-button-x:      26px;   /* right side */
-    --space-button-x-lead: 20px;   /* left side (asymmetric for icon) */
-    --space-button-ghost-y: 8px;
-    --space-button-ghost-x: 18px;
+  /* Button padding (asymmetric pill pattern from design system) */
+  --space-button-y: 10px;
+  --space-button-x: 26px; /* right side */
+  --space-button-x-lead: 20px; /* left side (asymmetric for icon) */
+  --space-button-ghost-y: 8px;
+  --space-button-ghost-x: 18px;
 
-    /* Badge padding */
-    --space-badge-y: 4px;
-    --space-badge-x: 8px;
+  /* Badge padding */
+  --space-badge-y: 4px;
+  --space-badge-x: 8px;
 
-    /* Output row padding (file card section) */
-    --space-card-y:     18px;
-    --space-card-y-sm:  14px;
-    --space-card-y-md:  12px;
-    --space-card-x:     20px;
-    --space-card-x-sm:  14px;
-    --space-card-x-md:  10px;
+  /* Output row padding (file card section) */
+  --space-card-y: 18px;
+  --space-card-y-sm: 14px;
+  --space-card-y-md: 12px;
+  --space-card-x: 20px;
+  --space-card-x-sm: 14px;
+  --space-card-x-md: 10px;
 
-    /* App main padding */
-    --space-app-main:  20px 28px 16px;
+  /* App main padding */
+  --space-app-main: 20px 28px 16px;
 
-    /* Action row / output row custom */
-    --space-list-y:     3px;
-    --space-list-x:     14px;
-    --space-reveal-y:   2px;
-    --space-pct-y:      6px;
-    --space-pct-x:     12px;
-    --space-output-line-y: 7px;
-    --space-output-line-x: 12px;
+  /* Action row / output row custom */
+  --space-list-y: 3px;
+  --space-list-x: 14px;
+  --space-reveal-y: 2px;
+  --space-pct-y: 6px;
+  --space-pct-x: 12px;
+  --space-output-line-y: 7px;
+  --space-output-line-x: 12px;
 
-    /* Split button padding (large primary CTA) */
-    --space-split-y:    10px;
-    --space-split-x-r:  24px;
-    --space-split-x-l:  20px;
+  /* Split button padding (large primary CTA) */
+  --space-split-y: 10px;
+  --space-split-x-r: 24px;
+  --space-split-x-l: 20px;
 
-    /* Drop zone button padding (compact) */
-    --space-dropzone-btn-y: 9px;
-    --space-dropzone-btn-x-r: 22px;
-    --space-dropzone-btn-x-l: 18px;
+  /* Drop zone button padding (compact) */
+  --space-dropzone-btn-y: 9px;
+  --space-dropzone-btn-x-r: 22px;
+  --space-dropzone-btn-x-l: 18px;
 
-    /* Component-specific sizes */
-    --size-app-footer:    28px;
-    --size-titlebar-traffic: 72px;
-    --size-wordmark-max:  90px;
-    --size-dropzone-min:  220px;
-    --size-min-w-130:     130px;
-    --size-min-w-140:     140px;
-    --size-min-w-148:     148px;
-    --size-min-w-360:     360px;
-    --size-min-w-380:     380px;
-    --size-min-w-400:     400px;
-    --size-min-w-pct:     58px;
-    --size-min-w-lineno:  26px;
-    --size-btn-height-sm: 36px;
-    --size-btn-height-md: 40px;
-    --size-btn-height-lg: 42px;
-    --size-btn-compact:   26px;
-    --size-btn-tiny:      22px;
-    --size-icon-dismiss:  28px;
-    --size-icon-status:   24px;
-    --size-icon-result:   32px;
-    --size-dot-sm:        6px;
-    --size-step-dot:      2px;
-    --size-step-dot-radius: 1px;
-    --size-glow-inset:    -80px;
-    --size-pct-min-h:     34px;
-    --size-hint-min-h:    16px;
-    --size-filename-max:  340px;
-    --size-list-max:      200px;
-    --size-glow-ring:     4px;
+  /* Component-specific sizes */
+  --size-app-footer: 28px;
+  --size-titlebar-traffic: 72px;
+  --size-wordmark-max: 90px;
+  --size-dropzone-min: 220px;
+  --size-min-w-130: 130px;
+  --size-min-w-140: 140px;
+  --size-min-w-148: 148px;
+  --size-min-w-360: 360px;
+  --size-min-w-380: 380px;
+  --size-min-w-400: 400px;
+  --size-min-w-pct: 58px;
+  --size-min-w-lineno: 26px;
+  --size-btn-height-sm: 36px;
+  --size-btn-height-md: 40px;
+  --size-btn-height-lg: 42px;
+  --size-btn-compact: 26px;
+  --size-btn-tiny: 22px;
+  --size-icon-dismiss: 28px;
+  --size-icon-status: 24px;
+  --size-icon-result: 32px;
+  --size-dot-sm: 6px;
+  --size-step-dot: 2px;
+  --size-step-dot-radius: 1px;
+  --size-glow-inset: -80px;
+  --size-pct-min-h: 34px;
+  --size-hint-min-h: 16px;
+  --size-filename-max: 340px;
+  --size-list-max: 200px;
+  --size-glow-ring: 4px;
 }

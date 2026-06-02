@@ -1,28 +1,28 @@
 <script setup lang="ts">
 defineProps<{
-    fileName: string
-    pageCount: number
-    fileSizeFormatted: string
-    outputDirShort: string
-    busy: boolean
-}>()
+  fileName: string;
+  pageCount: number;
+  fileSizeFormatted: string;
+  outputDirShort: string;
+  busy: boolean;
+}>();
 
 const emit = defineEmits<{
-    split: []
-    'change-file': []
-    'change-output': []
-}>()
+  split: [];
+  'change-file': [];
+  'change-output': [];
+}>();
 
 function onSplit(): void {
-    emit('split')
+  emit('split');
 }
 
 function onChangeFile(): void {
-    emit('change-file')
+  emit('change-file');
 }
 
 function onChangeOutput(): void {
-    emit('change-output')
+  emit('change-output');
 }
 </script>
 

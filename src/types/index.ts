@@ -2,20 +2,14 @@
  * PDF Splitter – TypeScript type definitions.
  */
 
-
 /**
  * Serialised form of `pdf::PdfError` emitted by every fallible command.
  */
 export interface PdfError {
   /** Machine-readable discriminant — matches the Rust enum variant name. */
-  kind:
-  | 'FileNotFound'
-  | 'InvalidPdf'
-  | 'Io'
-  | 'NoPages'
-  | 'Internal'
+  kind: 'FileNotFound' | 'InvalidPdf' | 'Io' | 'NoPages' | 'Internal';
   /** Human-readable description suitable for display in the UI. */
-  message: string
+  message: string;
 }
 
 /**
@@ -25,11 +19,11 @@ export interface PdfError {
  */
 export interface PageProgress {
   /** 1-based count of pages completed so far. */
-  current: number
+  current: number;
   /** Total number of pages in the source document. */
-  total: number
+  total: number;
   /** Filename of the most-recently completed output file, e.g. `"page_0042.pdf"`. */
-  fileName: string
+  fileName: string;
 }
 
 /**
@@ -39,11 +33,11 @@ export interface PageProgress {
  */
 export interface SplitResult {
   /** Total number of pages found in the source document. */
-  totalPages: number
+  totalPages: number;
   /** Absolute paths of every output file, sorted lexicographically. */
-  outputFiles: string[]
+  outputFiles: string[];
   /** Wall-clock time taken for the whole operation, in milliseconds. */
-  elapsedMs: number
+  elapsedMs: number;
 }
 
 /**
@@ -59,12 +53,7 @@ export interface SplitResult {
  * | `complete`   | Result list              |
  * | `error`      | Error card               |
  */
-export type AppState =
-  | 'idle'
-  | 'ready'
-  | 'processing'
-  | 'complete'
-  | 'error'
+export type AppState = 'idle' | 'ready' | 'processing' | 'complete' | 'error';
 
 /**
  * Metadata about the PDF file the user has selected, populated after
@@ -72,13 +61,13 @@ export type AppState =
  */
 export interface PdfFileInfo {
   /** Absolute path to the selected PDF file. */
-  path: string
+  path: string;
   /** Display name (basename), e.g. `"report.pdf"`. */
-  name: string
+  name: string;
   /** File size in bytes; used to render a human-readable size string. */
-  sizeBytes: number
+  sizeBytes: number;
   /** Number of pages reported by `get_page_count`. */
-  pageCount: number
+  pageCount: number;
 }
 
 /**
@@ -86,10 +75,10 @@ export interface PdfFileInfo {
  */
 export interface SplitOperation {
   /** Snapshot of the last `split://progress` event received. */
-  progress: PageProgress | null
+  progress: PageProgress | null;
   /** Resolved output directory path (may differ from the user's pick if a
    *  sub-directory was created automatically). */
-  outputDir: string
+  outputDir: string;
 }
 
 /**
@@ -99,11 +88,11 @@ export interface SplitOperation {
  * types they already depend on.
  */
 export function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const units = ['B', 'KB', 'MB', 'GB']
-  const exp = Math.min(Math.floor(Math.log2(bytes) / 10), units.length - 1)
-  const value = bytes / Math.pow(1024, exp)
-  return `${value.toFixed(exp === 0 ? 0 : 1)} ${units[exp]}`
+  if (bytes === 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const exp = Math.min(Math.floor(Math.log2(bytes) / 10), units.length - 1);
+  const value = bytes / 1024 ** exp;
+  return `${value.toFixed(exp === 0 ? 0 : 1)} ${units[exp]}`;
 }
 
 /**
@@ -111,7 +100,7 @@ export function formatBytes(bytes: number): string {
  * and Windows `\` separators.
  */
 export function basename(path: string): string {
-  return path.replace(/.*[\\/]/, '')
+  return path.replace(/.*[\\/]/, '');
 }
 
 /**
@@ -119,6 +108,6 @@ export function basename(path: string): string {
  * e.g. `1234` → `"1.2 s"`, `450` → `"450 ms"`.
  */
 export function formatDuration(ms: number): string {
-  if (ms < 1000) return `${ms} ms`
-  return `${(ms / 1000).toFixed(1)} s`
+  if (ms < 1000) return `${ms} ms`;
+  return `${(ms / 1000).toFixed(1)} s`;
 }

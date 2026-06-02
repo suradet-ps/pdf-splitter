@@ -3,15 +3,25 @@
   "private": true,
   "version": "1.0.2",
   "description": "A fast, beautiful macOS desktop app for splitting PDF files into individual pages.",
-  "repository": {"type":"git","url":"https://github.com/suradet-ps/pdf-splitter.git"},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/suradet-ps/pdf-splitter.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "fmt": "cd src-tauri && cargo fmt",
-    "fmt:check": "cd src-tauri && cargo fmt -- --check",
+    "fmt": "biome format --write .",
+    "fmt:cargo": "cd src-tauri && cargo fmt",
+    "fmt:check": "biome format .",
+    "fmt:cargo:check": "cd src-tauri && cargo fmt -- --check",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "ci": "biome ci .",
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
@@ -22,6 +32,7 @@
     "vue": "^3.5.32"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.16",
     "@tauri-apps/cli": "^2.10.1",
     "@vitejs/plugin-vue": "^6.0.6",
     "esbuild": "^0.28.0",

@@ -1,43 +1,41 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { basename } from '@/types'
+import { computed, ref } from 'vue';
+import { basename } from '@/types';
 
 const props = defineProps<{
-    totalPages: number
-    outputFiles: string[]
-    elapsedFormatted: string
-    outputDir: string
-}>()
+  totalPages: number;
+  outputFiles: string[];
+  elapsedFormatted: string;
+  outputDir: string;
+}>();
 
 const emit = defineEmits<{
-    reveal: [path: string]
-    reset: []
-}>()
+  reveal: [path: string];
+  reset: [];
+}>();
 
-const hoveredIndex = ref<number | null>(null)
+const hoveredIndex = ref<number | null>(null);
 
-const fileNames = computed<string[]>(() =>
-    props.outputFiles.map((p) => basename(p)),
-)
+const fileNames = computed<string[]>(() => props.outputFiles.map((p) => basename(p)));
 
 const summaryLabel = computed<string>(() => {
-    const pages = props.totalPages
-    const unit = pages === 1 ? 'file' : 'files'
-    return props.elapsedFormatted
-        ? `${pages} ${unit} · ${props.elapsedFormatted}`
-        : `${pages} ${unit}`
-})
+  const pages = props.totalPages;
+  const unit = pages === 1 ? 'file' : 'files';
+  return props.elapsedFormatted
+    ? `${pages} ${unit} · ${props.elapsedFormatted}`
+    : `${pages} ${unit}`;
+});
 
 function onRevealDir(): void {
-    emit('reveal', props.outputDir)
+  emit('reveal', props.outputDir);
 }
 
 function onRevealFile(path: string): void {
-    emit('reveal', path)
+  emit('reveal', path);
 }
 
 function onReset(): void {
-    emit('reset')
+  emit('reset');
 }
 </script>
 

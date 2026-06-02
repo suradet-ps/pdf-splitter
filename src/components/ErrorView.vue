@@ -1,47 +1,57 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { PdfError } from '@/types'
+import { computed } from 'vue';
+import type { PdfError } from '@/types';
 
 const props = defineProps<{
-    message: string
-    kind?: PdfError['kind']
-}>()
+  message: string;
+  kind?: PdfError['kind'];
+}>();
 
 const emit = defineEmits<{
-    retry: []
-    dismiss: []
-}>()
+  retry: [];
+  dismiss: [];
+}>();
 
 const hint = computed<string>(() => {
-    switch (props.kind) {
-        case 'FileNotFound':
-            return 'The file may have been moved, renamed, or deleted. Please select a valid PDF file.'
-        case 'InvalidPdf':
-            return 'The selected file could not be parsed as a PDF. Make sure the file is not corrupted or password-protected.'
-        case 'NoPages':
-            return 'The PDF document appears to have no pages. Please select a different file.'
-        case 'Io':
-            return 'A filesystem error occurred. Check that the output directory is accessible and that you have write permissions.'
-        case 'Internal':
-            return 'An unexpected internal error occurred. Please try again or report the issue if it persists.'
-        default:
-            return 'Please try again with a different file or output directory.'
-    }
-})
+  switch (props.kind) {
+    case 'FileNotFound':
+      return 'The file may have been moved, renamed, or deleted. Please select a valid PDF file.';
+    case 'InvalidPdf':
+      return 'The selected file could not be parsed as a PDF. Make sure the file is not corrupted or password-protected.';
+    case 'NoPages':
+      return 'The PDF document appears to have no pages. Please select a different file.';
+    case 'Io':
+      return 'A filesystem error occurred. Check that the output directory is accessible and that you have write permissions.';
+    case 'Internal':
+      return 'An unexpected internal error occurred. Please try again or report the issue if it persists.';
+    default:
+      return 'Please try again with a different file or output directory.';
+  }
+});
 
 const kindLabel = computed<string>(() => {
-    switch (props.kind) {
-        case 'FileNotFound': return 'File Not Found'
-        case 'InvalidPdf':   return 'Invalid PDF'
-        case 'NoPages':      return 'No Pages Found'
-        case 'Io':           return 'IO Error'
-        case 'Internal':     return 'Internal Error'
-        default:             return 'Something went wrong'
-    }
-})
+  switch (props.kind) {
+    case 'FileNotFound':
+      return 'File Not Found';
+    case 'InvalidPdf':
+      return 'Invalid PDF';
+    case 'NoPages':
+      return 'No Pages Found';
+    case 'Io':
+      return 'IO Error';
+    case 'Internal':
+      return 'Internal Error';
+    default:
+      return 'Something went wrong';
+  }
+});
 
-function onRetry(): void   { emit('retry') }
-function onDismiss(): void { emit('dismiss') }
+function onRetry(): void {
+  emit('retry');
+}
+function onDismiss(): void {
+  emit('dismiss');
+}
 </script>
 
 <template>

@@ -1,65 +1,61 @@
 <script setup lang="ts">
-
-import { ref } from 'vue'
-import { FileUp } from 'lucide-vue-next'
+import { FileUp } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 const props = defineProps<{
-    busy: boolean
-}>()
+  busy: boolean;
+}>();
 
 const emit = defineEmits<{
-    pick: []
-    drop: [path: string]
-}>()
+  pick: [];
+  drop: [path: string];
+}>();
 
-const isDragOver = ref(false)
-let dragCounter = 0
+const isDragOver = ref(false);
+let dragCounter = 0;
 
 function onDragEnter(event: DragEvent): void {
-    event.preventDefault()
-    dragCounter++
-    isDragOver.value = true
+  event.preventDefault();
+  dragCounter++;
+  isDragOver.value = true;
 }
 
 function onDragLeave(event: DragEvent): void {
-    event.preventDefault()
-    dragCounter--
-    if (dragCounter <= 0) {
-        dragCounter = 0
-        isDragOver.value = false
-    }
+  event.preventDefault();
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    isDragOver.value = false;
+  }
 }
 
 function onDragOver(event: DragEvent): void {
-    event.preventDefault()
-    if (event.dataTransfer) {
-        event.dataTransfer.dropEffect = 'copy'
-    }
+  event.preventDefault();
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'copy';
+  }
 }
 
 function onDrop(event: DragEvent): void {
-    event.preventDefault()
-    dragCounter = 0
-    isDragOver.value = false
+  event.preventDefault();
+  dragCounter = 0;
+  isDragOver.value = false;
 
-    if (props.busy) return
+  if (props.busy) return;
 
-    const files = event.dataTransfer?.files
-    if (!files || files.length === 0) return
+  const files = event.dataTransfer?.files;
+  if (!files || files.length === 0) return;
 
-    const file = files[0]
-    const isPdf =
-        file.type === 'application/pdf' ||
-        file.name.toLowerCase().endsWith('.pdf')
-    if (!isPdf) return
+  const file = files[0];
+  const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  if (!isPdf) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const path: string | undefined = (file as any).path
-    if (path) emit('drop', path)
+  const path: string | undefined = (file as unknown as { path?: string }).path;
+  if (path) emit('drop', path);
 }
 
 function onSelectClick(): void {
-    if (!props.busy) emit('pick')
+  if (!props.busy) emit('pick');
 }
 </script>
 

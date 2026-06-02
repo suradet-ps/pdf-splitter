@@ -1,37 +1,37 @@
-import { ref, computed, onUnmounted } from 'vue'
-import { invoke } from '@tauri-apps/api/core'
-import { listen, type UnlistenFn } from '@tauri-apps/api/event'
+import { invoke } from '@tauri-apps/api/core';
+import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import { computed, onUnmounted, ref } from 'vue';
 
 import {
   type AppState,
-  type PdfFileInfo,
-  type PageProgress,
-  type SplitResult,
-  type PdfError,
-  type SplitOperation,
-  formatBytes,
   basename,
+  formatBytes,
   formatDuration,
-} from '@/types'
+  type PageProgress,
+  type PdfError,
+  type PdfFileInfo,
+  type SplitOperation,
+  type SplitResult,
+} from '@/types';
 
 /**
  * Response from the `get_file_info` Tauri command.
  * Mirrors `commands::FileInfo` in `src-tauri/src/commands.rs`.
  */
 interface FileInfoResponse {
-  pageCount: number
-  sizeBytes: number
+  pageCount: number;
+  sizeBytes: number;
 }
 
 /** Tauri event name for per-page progress updates. */
-const EVENT_PROGRESS = 'split://progress' as const
+const EVENT_PROGRESS = 'split://progress' as const;
 
 export function usePdfSplitter() {
   /** Current step in the application flow. */
-  const state = ref<AppState>('idle')
+  const state = ref<AppState>('idle');
 
   /** Metadata for the user-selected PDF, populated in the `ready` state. */
-  const fileInfo = ref<PdfFileInfo | null>(null)
+  const fileInfo = ref<PdfFileInfo | null>(null);
 
   /**
    * The directory where split pages will be saved.
@@ -39,24 +39,22 @@ export function usePdfSplitter() {
    * Defaults to a sub-directory named after the PDF stem inside the same
    * folder as the source file.  The user can override this via `pickOutputDir`.
    */
-  const outputDir = ref<string>('')
+  const outputDir = ref<string>('');
 
   /** Current operation snapshot — only meaningful during `processing`. */
-  const operation = ref<SplitOperation | null>(null)
+  const operation = ref<SplitOperation | null>(null);
 
   /** Result of the last successful split — only meaningful during `complete`. */
-  const result = ref<SplitResult | null>(null)
+  const result = ref<SplitResult | null>(null);
 
   /** Last error encountered — only meaningful during `error`. */
-  const error = ref<string | null>(null)
+  const error = ref<string | null>(null);
 
   /** Whether an async operation is pending (disables interactive controls). */
-  const isBusy = ref(false)
+  const isBusy = ref(false);
 
   /** Cleanup function returned by `listen()`; called on component unmount. */
-  let unlistenProgress: UnlistenFn | null = null
-
-
+  let unlistenProgress: UnlistenFn | null = null;
 
   /**
    * Pending progress payload waiting to be committed on the next animation
@@ -65,37 +63,37 @@ export function usePdfSplitter() {
    * This prevents Vue from re-rendering hundreds of times per second during
    * large splits.
    */
-  let pendingProgress: PageProgress | null = null
+  let pendingProgress: PageProgress | null = null;
 
   /** `requestAnimationFrame` handle so we can cancel on cleanup. */
-  let rafHandle: number | null = null
+  let rafHandle: number | null = null;
 
   /** Formatted file size string, e.g. `"2.4 MB"`. */
   const fileSizeFormatted = computed<string>(() =>
     fileInfo.value ? formatBytes(fileInfo.value.sizeBytes) : '',
-  )
+  );
 
   /**
    * Progress as a percentage (0–100), rounded to the nearest integer.
    * Returns `0` when no operation is in progress.
    */
   const progressPercent = computed<number>(() => {
-    const p = operation.value?.progress
-    if (!p || p.total === 0) return 0
-    return Math.round((p.current / p.total) * 100)
-  })
+    const p = operation.value?.progress;
+    if (!p || p.total === 0) return 0;
+    return Math.round((p.current / p.total) * 100);
+  });
 
   /** Human-readable progress label, e.g. `"Processing page 3 of 10…"`. */
   const progressLabel = computed<string>(() => {
-    const p = operation.value?.progress
-    if (!p) return 'Starting…'
-    return `Processing page ${p.current} of ${p.total}…`
-  })
+    const p = operation.value?.progress;
+    if (!p) return 'Starting…';
+    return `Processing page ${p.current} of ${p.total}…`;
+  });
 
   /** Human-readable elapsed time string for the result view. */
   const elapsedFormatted = computed<string>(() =>
     result.value ? formatDuration(result.value.elapsedMs) : '',
-  )
+  );
 
   /**
    * Display-friendly basename of the output directory.
@@ -104,10 +102,10 @@ export function usePdfSplitter() {
    * components keeps the UI clean without losing useful context.
    */
   const outputDirShort = computed<string>(() => {
-    if (!outputDir.value) return ''
-    const parts = outputDir.value.replace(/\\/g, '/').split('/')
-    return parts.slice(-2).join('/')
-  })
+    if (!outputDir.value) return '';
+    const parts = outputDir.value.replace(/\\/g, '/').split('/');
+    return parts.slice(-2).join('/');
+  });
 
   /**
    * Derive the default output directory from a given input file path.
@@ -116,14 +114,12 @@ export function usePdfSplitter() {
    * Example: `/Users/alice/Docs/report.pdf` → `/Users/alice/Docs/report`
    */
   function defaultOutputDir(inputPath: string): string {
-    const normalised = inputPath.replace(/\\/g, '/')
-    const lastSlash = normalised.lastIndexOf('/')
-    const dir = lastSlash >= 0 ? normalised.slice(0, lastSlash) : '.'
-    const file = lastSlash >= 0 ? normalised.slice(lastSlash + 1) : normalised
-    const stem = file.endsWith('.pdf')
-      ? file.slice(0, file.length - 4)
-      : file
-    return `${dir}/${stem}`
+    const normalised = inputPath.replace(/\\/g, '/');
+    const lastSlash = normalised.lastIndexOf('/');
+    const dir = lastSlash >= 0 ? normalised.slice(0, lastSlash) : '.';
+    const file = lastSlash >= 0 ? normalised.slice(lastSlash + 1) : normalised;
+    const stem = file.endsWith('.pdf') ? file.slice(0, file.length - 4) : file;
+    return `${dir}/${stem}`;
   }
 
   /**
@@ -132,14 +128,14 @@ export function usePdfSplitter() {
    */
   async function disposeProgressListener(): Promise<void> {
     if (unlistenProgress) {
-      unlistenProgress()
-      unlistenProgress = null
+      unlistenProgress();
+      unlistenProgress = null;
     }
     if (rafHandle !== null) {
-      cancelAnimationFrame(rafHandle)
-      rafHandle = null
+      cancelAnimationFrame(rafHandle);
+      rafHandle = null;
     }
-    pendingProgress = null
+    pendingProgress = null;
   }
 
   /**
@@ -158,26 +154,26 @@ export function usePdfSplitter() {
    * ref once per frame.
    */
   async function attachProgressListener(): Promise<void> {
-    await disposeProgressListener()
+    await disposeProgressListener();
 
     unlistenProgress = await listen<PageProgress>(EVENT_PROGRESS, (event) => {
-      const p = event.payload
+      const p = event.payload;
 
-      pendingProgress = p
+      pendingProgress = p;
 
       if (rafHandle === null) {
         rafHandle = requestAnimationFrame(() => {
-          rafHandle = null
+          rafHandle = null;
           if (pendingProgress && operation.value) {
             operation.value = {
               ...operation.value,
               progress: { ...pendingProgress },
-            }
-            pendingProgress = null
+            };
+            pendingProgress = null;
           }
-        })
+        });
       }
-    })
+    });
   }
 
   /**
@@ -187,12 +183,12 @@ export function usePdfSplitter() {
    * shapes we fall back to `JSON.stringify` so nothing is silently swallowed.
    */
   function describeError(raw: unknown): string {
-    if (typeof raw === 'string') return raw
+    if (typeof raw === 'string') return raw;
     if (raw && typeof raw === 'object') {
-      const e = raw as Partial<PdfError>
-      if (e.message) return e.message
+      const e = raw as Partial<PdfError>;
+      if (e.message) return e.message;
     }
-    return JSON.stringify(raw)
+    return JSON.stringify(raw);
   }
 
   /**
@@ -202,34 +198,34 @@ export function usePdfSplitter() {
    *              (cancelled dialog leaves state unchanged)
    */
   async function pickFile(): Promise<void> {
-    if (isBusy.value) return
-    isBusy.value = true
+    if (isBusy.value) return;
+    isBusy.value = true;
 
     try {
-      const path = await invoke<string | null>('pick_pdf_file')
-      if (!path) return // User cancelled — no state change.
+      const path = await invoke<string | null>('pick_pdf_file');
+      if (!path) return; // User cancelled — no state change.
 
       // `get_file_info` returns both page count and file size in one round-trip,
       // eliminating the need for `@tauri-apps/plugin-fs` in the renderer.
-      const info = await invoke<FileInfoResponse>('get_file_info', { path })
+      const info = await invoke<FileInfoResponse>('get_file_info', { path });
 
       fileInfo.value = {
         path,
         name: basename(path),
         sizeBytes: info.sizeBytes,
         pageCount: info.pageCount,
-      }
+      };
 
-      outputDir.value = defaultOutputDir(path)
-      result.value = null
-      error.value = null
-      operation.value = null
-      state.value = 'ready'
+      outputDir.value = defaultOutputDir(path);
+      result.value = null;
+      error.value = null;
+      operation.value = null;
+      state.value = 'ready';
     } catch (raw) {
-      error.value = describeError(raw)
-      state.value = 'error'
+      error.value = describeError(raw);
+      state.value = 'error';
     } finally {
-      isBusy.value = false
+      isBusy.value = false;
     }
   }
 
@@ -240,19 +236,19 @@ export function usePdfSplitter() {
    * keeps its current value.
    */
   async function pickOutputDir(): Promise<void> {
-    if (isBusy.value || state.value !== 'ready') return
-    isBusy.value = true
+    if (isBusy.value || state.value !== 'ready') return;
+    isBusy.value = true;
 
     try {
-      const dir = await invoke<string | null>('pick_output_dir')
+      const dir = await invoke<string | null>('pick_output_dir');
       if (dir) {
-        outputDir.value = dir
+        outputDir.value = dir;
       }
     } catch (raw) {
       // Non-fatal: the user can still split using the default output dir.
-      console.warn('[usePdfSplitter] pickOutputDir failed:', describeError(raw))
+      console.warn('[usePdfSplitter] pickOutputDir failed:', describeError(raw));
     } finally {
-      isBusy.value = false
+      isBusy.value = false;
     }
   }
 
@@ -262,36 +258,36 @@ export function usePdfSplitter() {
    * Transitions: `ready` → `processing` → `complete` / `error`
    */
   async function startSplit(): Promise<void> {
-    if (isBusy.value || state.value !== 'ready' || !fileInfo.value) return
+    if (isBusy.value || state.value !== 'ready' || !fileInfo.value) return;
 
-    isBusy.value = true
-    error.value = null
+    isBusy.value = true;
+    error.value = null;
 
     try {
       // Set up progress listener *before* invoking the command so we never
       // miss the first event.
-      await attachProgressListener()
+      await attachProgressListener();
 
       operation.value = {
         progress: null,
         outputDir: outputDir.value,
-      }
-      state.value = 'processing'
+      };
+      state.value = 'processing';
 
       const splitResult = await invoke<SplitResult>('split_pdf', {
         inputPath: fileInfo.value.path,
         outputDir: outputDir.value,
-      })
+      });
 
-      result.value = splitResult
-      state.value = 'complete'
+      result.value = splitResult;
+      state.value = 'complete';
     } catch (raw) {
-      error.value = describeError(raw)
-      state.value = 'error'
+      error.value = describeError(raw);
+      state.value = 'error';
     } finally {
-      await disposeProgressListener()
-      operation.value = null
-      isBusy.value = false
+      await disposeProgressListener();
+      operation.value = null;
+      isBusy.value = false;
     }
   }
 
@@ -301,13 +297,13 @@ export function usePdfSplitter() {
    * Silently ignores failures (e.g. if the folder was deleted after splitting).
    */
   async function revealOutput(path?: string): Promise<void> {
-    const target = path ?? (result.value?.outputFiles[0] ?? outputDir.value)
-    if (!target) return
+    const target = path ?? result.value?.outputFiles[0] ?? outputDir.value;
+    if (!target) return;
 
     try {
-      await invoke('reveal_in_finder', { path: target })
+      await invoke('reveal_in_finder', { path: target });
     } catch (raw) {
-      console.warn('[usePdfSplitter] revealOutput failed:', describeError(raw))
+      console.warn('[usePdfSplitter] revealOutput failed:', describeError(raw));
     }
   }
 
@@ -316,20 +312,20 @@ export function usePdfSplitter() {
    * another file.
    */
   async function reset(): Promise<void> {
-    await disposeProgressListener()
-    state.value = 'idle'
-    fileInfo.value = null
-    outputDir.value = ''
-    operation.value = null
-    result.value = null
-    error.value = null
-    isBusy.value = false
+    await disposeProgressListener();
+    state.value = 'idle';
+    fileInfo.value = null;
+    outputDir.value = '';
+    operation.value = null;
+    result.value = null;
+    error.value = null;
+    isBusy.value = false;
   }
 
   /** Clean up the event listener when the owning component is destroyed. */
   onUnmounted(() => {
-    disposeProgressListener().catch(console.error)
-  })
+    disposeProgressListener().catch(console.error);
+  });
 
   return {
     /** Current application state. */
@@ -368,8 +364,8 @@ export function usePdfSplitter() {
     revealOutput,
     /** Reset to initial state. */
     reset,
-  } as const
+  } as const;
 }
 
 /** Convenience type alias for the return value of `usePdfSplitter`. */
-export type UsePdfSplitter = ReturnType<typeof usePdfSplitter>
+export type UsePdfSplitter = ReturnType<typeof usePdfSplitter>;
