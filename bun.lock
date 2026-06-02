@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "pdf-splitter",
@@ -12,7 +13,7 @@
       },
       "devDependencies": {
         "@tauri-apps/cli": "^2.10.1",
-        "@vitejs/plugin-vue": "^6.0.6",
+        "@vitejs/plugin-vue": "^6.0.7",
         "esbuild": "^0.28.0",
         "typescript": "^6.0.2",
         "vite": "^8.0.8",
