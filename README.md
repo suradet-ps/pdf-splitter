@@ -30,7 +30,7 @@ The app is built on a native [Tauri 2](https://tauri.app/) shell with a [Vue 3](
 ### Prerequisites
 
 - [Rust + Cargo](https://rustup.rs/) (≥ 1.80)
-- [Node.js](https://nodejs.org/) (≥ 18)
+- [Bun](https://bun.sh/) (≥ 1.0)
 - **macOS**: Xcode Command Line Tools (`xcode-select --install`)
 - **Windows**: Build Tools for Visual Studio (C++ build tools)
 
@@ -42,10 +42,10 @@ git clone https://github.com/suradet-ps/pdf-splitter.git
 cd pdf-splitter
 
 # 2. Install frontend dependencies
-npm install
+bun install
 
 # 3. Start the development server (hot-reload for UI + Rust)
-npm run tauri dev
+bun run tauri dev
 ```
 
 ### Production Build
@@ -54,7 +54,7 @@ npm run tauri dev
 
 ```bash
 # Build the optimized binary + macOS app bundle + DMG installer
-npm run tauri build
+bun run tauri build
 ```
 
 The output artifacts (macOS `.app` bundle and `.dmg` installer) will be generated in the `src-tauri/target/release/bundle/` directory.
@@ -64,7 +64,7 @@ The output artifacts (macOS `.app` bundle and `.dmg` installer) will be generate
 You can build the app locally on Windows using the same command:
 
 ```bash
-npm run tauri build
+bun run tauri build
 ```
 
 The output artifacts (`.msi` or `.exe` installer) will be generated in the `src-tauri/target/release/bundle/` directory.
