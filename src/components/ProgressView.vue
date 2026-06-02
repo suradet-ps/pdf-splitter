@@ -179,10 +179,10 @@ const stepDots = computed<boolean[]>(() => {
 /* Status icon (spinner / check) */
 .progress-view__indicator {
     flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+    width: var(--size-icon-status);
+    height: var(--size-icon-status);
     color: var(--color-accent);
-    margin-top: 3px;
+    margin-top: var(--space-1);
     filter: drop-shadow(0 0 6px var(--color-accent-glow));
 }
 
@@ -192,7 +192,7 @@ const stepDots = computed<boolean[]>(() => {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: var(--space-1);
 }
 
 .progress-view__title {
@@ -209,7 +209,7 @@ const stepDots = computed<boolean[]>(() => {
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     line-height: var(--leading-normal);
-    max-width: 340px;
+    max-width: var(--size-filename-max);
 }
 
 .progress-view__status {
@@ -229,12 +229,12 @@ const stepDots = computed<boolean[]>(() => {
     flex-shrink: 0;
     display: flex;
     align-items: baseline;
-    gap: 2px;
+    gap: var(--space-1);
     background: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
+    border: var(--border-thin) solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: 6px 12px;
-    min-width: 58px;
+    padding: var(--space-pct-y) var(--space-pct-x);
+    min-width: var(--size-min-w-pct);
     justify-content: center;
     transition:
         color var(--duration-normal) var(--ease-out),
@@ -243,7 +243,7 @@ const stepDots = computed<boolean[]>(() => {
 
 .progress-view__pct--finalising {
     color: var(--color-accent);
-    border-color: rgba(54, 244, 164, 0.3);
+    border-color: rgba(var(--color-accent-rgb), var(--opacity-busy));
 }
 
 .progress-view__pct-number {
@@ -251,14 +251,14 @@ const stepDots = computed<boolean[]>(() => {
     font-size: var(--text-xl);
     font-weight: var(--weight-semibold);
     color: inherit;
-    line-height: 1;
+    line-height: var(--leading-tight);
 }
 
 .progress-view__pct-unit {
     font-family: var(--font-sans);
     font-size: var(--text-xs);
     color: var(--color-text-quaternary);
-    line-height: 1;
+    line-height: var(--leading-tight);
 }
 
 .progress-view__pct--finalising .progress-view__pct-number,
@@ -285,19 +285,19 @@ const stepDots = computed<boolean[]>(() => {
     font-size: var(--text-md);
     font-weight: var(--weight-medium);
     color: var(--color-text-secondary);
-    line-height: 1;
+    line-height: var(--leading-tight);
 }
 
 .progress-section__unit {
     font-family: var(--font-sans);
     font-size: var(--text-sm);
     color: var(--color-text-quaternary);
-    line-height: 1;
+    line-height: var(--leading-tight);
 }
 
 /* Track + fill — from global .progress-track / .progress-fill styles */
 .progress-section .progress-track {
-    height: 3px;
+    height: var(--size-progress-track);
     will-change: contents;
 }
 
@@ -305,27 +305,27 @@ const stepDots = computed<boolean[]>(() => {
 .step-dots {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: var(--space-1);
     margin-top: var(--space-1);
 }
 
 .step-dot {
     flex: 1;
-    height: 2px;
-    border-radius: 1px;
+    height: var(--size-step-dot);
+    border-radius: var(--size-step-dot-radius);
     background: var(--color-border);
     transition: background-color var(--duration-normal) var(--ease-out);
 }
 
 .step-dot--done {
     background: var(--color-accent);
-    opacity: 0.6;
+    opacity: var(--opacity-busy);
 }
 
 /* ─── Output stream ─── */
 
 .output-stream {
-    min-height: 34px;
+    min-height: var(--size-pct-min-h);
     display: flex;
     flex-direction: column;
 }
@@ -337,9 +337,9 @@ const stepDots = computed<boolean[]>(() => {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     line-height: var(--leading-normal);
-    padding: 7px 12px;
+    padding: var(--space-output-line-y) var(--space-output-line-x);
     border-radius: var(--radius-md);
-    border-left: 2px solid transparent;
+    border-left: var(--border-thick) solid transparent;
 }
 
 .output-line--ok {
@@ -361,8 +361,8 @@ const stepDots = computed<boolean[]>(() => {
 
 .output-line__dot {
     flex-shrink: 0;
-    width: 6px;
-    height: 6px;
+    width: var(--size-dot-sm);
+    height: var(--size-dot-sm);
     border-radius: 50%;
     background: var(--color-text-quaternary);
     display: inline-block;

@@ -180,21 +180,21 @@ function onDismiss(): void { emit('dismiss') }
 /* Error icon */
 .error-icon {
     flex-shrink: 0;
-    width: 32px;
-    height: 32px;
+    width: var(--size-icon-result);
+    height: var(--size-icon-result);
     color: var(--color-error);
-    filter: drop-shadow(0 0 8px rgba(248, 81, 73, 0.35));
+    filter: drop-shadow(0 0 8px rgba(var(--color-error-rgb), 0.35));
     animation: error-icon-in var(--duration-slower) var(--ease-spring) forwards;
 }
 
 @keyframes error-icon-in {
-    0%   { transform: scale(0.5); opacity: 0; }
-    70%  { transform: scale(1.15); opacity: 1; }
-    100% { transform: scale(1);   opacity: 1; }
+    0%   { transform: scale(var(--scale-error-1)); opacity: 0; }
+    70%  { transform: scale(var(--scale-error-2)); opacity: 1; }
+    100% { transform: scale(1);                    opacity: 1; }
 }
 
 .error-icon__circle {
-    opacity: 0.12;
+    opacity: var(--opacity-icon-subtle);
 }
 
 .error-icon__x {
@@ -205,7 +205,7 @@ function onDismiss(): void { emit('dismiss') }
 .error-header__text {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: var(--space-1);
     min-width: 0;
 }
 
@@ -230,9 +230,9 @@ function onDismiss(): void { emit('dismiss') }
    ───────────────────────────────────────────── */
 
 .error-block {
-    border: 1px solid rgba(var(--color-error-rgb), 0.2);
+    border: var(--border-thin) solid rgba(var(--color-error-rgb), var(--alpha-strong));
     border-radius: var(--radius-md);
-    background: rgba(var(--color-error-rgb), 0.05);
+    background: rgba(var(--color-error-rgb), var(--alpha-soft));
     overflow: hidden;
 }
 
@@ -240,9 +240,9 @@ function onDismiss(): void { emit('dismiss') }
 .error-block__label {
     display: flex;
     align-items: center;
-    padding: 4px 14px;
-    background: rgba(var(--color-error-rgb), 0.07);
-    border-bottom: 1px solid rgba(var(--color-error-rgb), 0.14);
+    padding: var(--space-badge-y) var(--space-card-x-sm);
+    background: rgba(var(--color-error-rgb), var(--alpha-medium));
+    border-bottom: var(--border-thin) solid rgba(var(--color-error-rgb), var(--opacity-error-soft));
 }
 
 .error-block__label-text {
@@ -252,7 +252,7 @@ function onDismiss(): void { emit('dismiss') }
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
     color: var(--color-error-text);
-    opacity: 0.65;
+    opacity: var(--opacity-error-label);
 }
 
 /* Selectable error message */
@@ -261,7 +261,7 @@ function onDismiss(): void { emit('dismiss') }
     font-size: var(--text-sm);
     color: var(--color-error-text);
     line-height: var(--leading-snug);
-    padding: 10px 14px;
+    padding: var(--space-button-y) var(--space-card-x-sm);
     user-select: text;
     cursor: text;
     word-break: break-all;
@@ -275,7 +275,7 @@ function onDismiss(): void { emit('dismiss') }
     color: var(--color-error);
     font-weight: var(--weight-bold);
     flex-shrink: 0;
-    opacity: 0.75;
+    opacity: var(--opacity-error-prefix);
 }
 
 /* ─────────────────────────────────────────────
@@ -291,7 +291,7 @@ function onDismiss(): void { emit('dismiss') }
 .error-note__icon {
     flex-shrink: 0;
     color: var(--color-text-quaternary);
-    margin-top: 1px;
+    margin-top: var(--border-thin);
 }
 
 .error-note__text {
@@ -318,15 +318,15 @@ function onDismiss(): void { emit('dismiss') }
 .error-actions__dismiss {
     font-family: var(--font-sans);
     font-size: var(--text-sm);
-    padding: 8px 18px;
-    height: 36px;
+    padding: var(--space-button-ghost-y) var(--space-button-ghost-x);
+    height: var(--size-btn-height-sm);
     color: var(--color-text-tertiary);
 }
 
 /* "Try again" — primary pill with subtle glow */
 .error-actions__retry {
-    min-width: 130px;
-    height: 40px;
+    min-width: var(--size-min-w-130);
+    height: var(--size-btn-height-md);
     font-size: var(--text-md);
     gap: var(--space-2);
 }

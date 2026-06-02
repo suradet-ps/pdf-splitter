@@ -158,8 +158,8 @@ async function onDismiss(): Promise<void> {
 
 <style scoped>
 .app {
-    width: 720px;
-    height: 560px;
+    width: var(--size-app-width);
+    height: var(--size-app-height);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -174,7 +174,7 @@ async function onDismiss(): Promise<void> {
     z-index: 0;
     background: radial-gradient(
         ellipse 80% 40% at 50% 0%,
-        rgba(16, 38, 32, 0.8) 0%,
+        var(--color-surface-elevated) 0%,
         transparent 70%
     );
 }
@@ -187,14 +187,14 @@ async function onDismiss(): Promise<void> {
     justify-content: center;
     flex-shrink: 0;
     z-index: var(--z-overlay);
-    border-bottom: 1px solid var(--color-border-subtle);
-    background: rgba(0, 0, 0, 0.4);
+    border-bottom: var(--border-thin) solid var(--color-border-subtle);
+    background: rgba(var(--color-black-rgb), var(--opacity-backdrop-strong));
 }
 
 .titlebar__traffic-lights {
     position: absolute;
     left: 0;
-    width: 72px;
+    width: var(--size-titlebar-traffic);
     height: 100%;
 }
 
@@ -203,9 +203,9 @@ async function onDismiss(): Promise<void> {
     font-weight: var(--weight-medium);
     color: var(--color-text-quaternary);
     font-family: var(--font-mono);
-    letter-spacing: 0.02em;
+    letter-spacing: var(--tracking-wide);
     pointer-events: none;
-    max-width: 400px;
+    max-width: var(--size-min-w-400);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -216,7 +216,7 @@ async function onDismiss(): Promise<void> {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 20px 28px 16px;
+    padding: var(--space-app-main);
     overflow: hidden;
     min-height: 0;
     position: relative;
@@ -226,13 +226,13 @@ async function onDismiss(): Promise<void> {
 .app__wordmark-wrapper {
     flex-shrink: 0;
     overflow: hidden;
-    max-height: 90px;
-    padding-bottom: 20px;
+    max-height: var(--size-wordmark-max);
+    padding-bottom: var(--space-5);
     opacity: 1;
     transition:
-        max-height 280ms var(--ease-out),
-        padding-bottom 280ms var(--ease-out),
-        opacity 180ms var(--ease-out);
+        max-height var(--duration-slow) var(--ease-out),
+        padding-bottom var(--duration-slow) var(--ease-out),
+        opacity var(--duration-normal) var(--ease-out);
 }
 
 .app__wordmark-wrapper--hidden {
@@ -245,9 +245,9 @@ async function onDismiss(): Promise<void> {
 .app__wordmark {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--color-border-subtle);
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: var(--border-thin) solid var(--color-border-subtle);
 }
 
 .app__heading-group {
@@ -312,23 +312,23 @@ async function onDismiss(): Promise<void> {
 }
 
 .result-wrapper :deep(.file-list-container) {
-    max-height: 200px;
+    max-height: var(--size-list-max);
 }
 
 .app__footer {
-    height: 28px;
+    height: var(--size-app-footer);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    border-top: 1px solid var(--color-border-subtle);
-    background: rgba(0, 0, 0, 0.3);
+    border-top: var(--border-thin) solid var(--color-border-subtle);
+    background: rgba(var(--color-black-rgb), var(--opacity-backdrop-medium));
 }
 
 .app__footer-text {
     font-size: var(--text-xs);
     color: var(--color-text-quaternary);
-    letter-spacing: 0.06em;
+    letter-spacing: var(--tracking-wide);
     white-space: nowrap;
     font-family: var(--font-sans);
 }
@@ -336,7 +336,7 @@ async function onDismiss(): Promise<void> {
 .app[data-state="processing"] {
     background-image: radial-gradient(
         ellipse 60% 30% at 50% 0%,
-        rgba(var(--color-accent-rgb), 0.05) 0%,
+        rgba(var(--color-accent-rgb), var(--alpha-soft)) 0%,
         transparent 100%
     );
 }
@@ -344,7 +344,7 @@ async function onDismiss(): Promise<void> {
 .app[data-state="complete"] {
     background-image: radial-gradient(
         ellipse 60% 30% at 50% 0%,
-        rgba(var(--color-accent-rgb), 0.07) 0%,
+        rgba(var(--color-accent-rgb), var(--alpha-medium)) 0%,
         transparent 100%
     );
 }
@@ -352,17 +352,17 @@ async function onDismiss(): Promise<void> {
 .app[data-state="error"] {
     background-image: radial-gradient(
         ellipse 60% 30% at 50% 0%,
-        rgba(var(--color-error-rgb), 0.05) 0%,
+        rgba(var(--color-error-rgb), var(--alpha-soft)) 0%,
         transparent 100%
     );
 }
 
 .app[data-state="processing"] .titlebar__title,
 .app[data-state="complete"] .titlebar__title {
-    color: rgba(var(--color-accent-rgb), 0.6);
+    color: rgba(var(--color-accent-rgb), var(--opacity-busy));
 }
 
 .app[data-state="error"] .titlebar__title {
-    color: rgba(var(--color-error-rgb), 0.6);
+    color: rgba(var(--color-error-rgb), var(--opacity-busy));
 }
 </style>

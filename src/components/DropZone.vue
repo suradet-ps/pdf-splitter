@@ -151,7 +151,7 @@ function onSelectClick(): void {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-3);
     width: 100%;
     flex: 1;
 }
@@ -161,7 +161,7 @@ function onSelectClick(): void {
 .drop-zone {
     width: 100%;
     flex: 1;
-    min-height: 220px;
+    min-height: var(--size-dropzone-min);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -188,23 +188,23 @@ function onSelectClick(): void {
     background: rgba(var(--color-accent-rgb), 0.03);
     border-color: var(--color-accent);
     box-shadow:
-        0 0 0 4px rgba(var(--color-accent-rgb), 0.08),
+        0 0 0 var(--size-glow-ring) rgba(var(--color-accent-rgb), 0.08),
         inset 0 0 60px rgba(var(--color-accent-rgb), 0.03);
 }
 
 /* Busy state */
 .drop-zone--busy {
-    opacity: 0.6;
+    opacity: var(--opacity-busy);
     cursor: default;
 }
 
 /* Radial glow — only visible on drag-over */
 .drop-zone__glow {
     position: absolute;
-    inset: -80px;
+    inset: var(--size-glow-inset);
     background: radial-gradient(
         ellipse at center,
-        rgba(var(--color-accent-rgb), 0.10) 0%,
+        rgba(var(--color-accent-rgb), var(--opacity-icon-soft)) 0%,
         transparent 60%
     );
     opacity: 0;
@@ -245,15 +245,15 @@ function onSelectClick(): void {
     color: var(--color-accent);
 }
 
-.icon-body   { opacity: 0.10; }
-.icon-fold   { opacity: 0.05; }
-.icon-fold-stroke { opacity: 0.12; }
-.icon-band   { opacity: 0.65; }
-.icon-label  { opacity: 0.85; fill: currentColor; }
-.icon-line   { opacity: 0.12; }
+.icon-body        { opacity: var(--opacity-icon-soft); }
+.icon-fold        { opacity: var(--opacity-icon-faint); }
+.icon-fold-stroke { opacity: var(--opacity-icon-subtle); }
+.icon-band        { opacity: var(--opacity-disabled); }
+.icon-label       { opacity: var(--opacity-icon-strong); fill: currentColor; }
+.icon-line        { opacity: var(--opacity-icon-subtle); }
 
-.drop-zone--active .icon-body  { opacity: 0.18; }
-.drop-zone--active .icon-band  { opacity: 0.85; }
+.drop-zone--active .icon-body  { opacity: var(--opacity-icon-medium); }
+.drop-zone--active .icon-band  { opacity: var(--opacity-icon-strong); }
 
 /* Labels */
 
@@ -261,7 +261,7 @@ function onSelectClick(): void {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1);
 }
 
 .drop-zone__heading {
@@ -270,7 +270,7 @@ function onSelectClick(): void {
     font-weight: var(--weight-light);
     color: var(--color-text-primary);
     line-height: var(--leading-snug);
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-tight);
     transition: color var(--duration-normal) var(--ease-out);
 }
 
@@ -292,8 +292,8 @@ function onSelectClick(): void {
     /* Inherits .btn-primary — white pill */
     gap: var(--space-2);
     font-size: var(--text-md);
-    padding: 9px 22px 9px 18px;
-    min-height: 40px;
+    padding: var(--space-dropzone-btn-y) var(--space-dropzone-btn-x-r) var(--space-dropzone-btn-y) var(--space-dropzone-btn-x-l);
+    min-height: var(--size-btn-height-md);
 }
 
 /* Hint text */
@@ -302,9 +302,9 @@ function onSelectClick(): void {
     font-family: var(--font-sans);
     font-size: var(--text-xs);
     color: var(--color-text-quaternary);
-    letter-spacing: 0.03em;
+    letter-spacing: var(--tracking-wide);
     text-align: center;
     line-height: var(--leading-normal);
-    min-height: 16px;
+    min-height: var(--size-hint-min-h);
 }
 </style>

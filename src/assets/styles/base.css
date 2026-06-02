@@ -33,8 +33,8 @@ body {
     letter-spacing: var(--tracking-normal);
     color: var(--color-text-primary);
     background: var(--color-bg);
-    width: 720px;
-    height: 560px;
+    width: var(--size-app-width);
+    height: var(--size-app-height);
     overflow: hidden;
     user-select: none;
     cursor: default;
@@ -97,6 +97,6 @@ textarea,
 }
 
 ::selection {
-    background: rgba(54, 244, 164, 0.22);
+    background: rgba(var(--color-accent-rgb), 0.22);
     color: var(--color-text-primary);
 }

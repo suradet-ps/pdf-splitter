@@ -72,6 +72,13 @@
     --duration-slow:   300ms;
     --duration-slower: 420ms;
 
+    /* Loop durations (for infinite keyframe animations) */
+    --duration-pulse:   2000ms;
+    --duration-spin:    1000ms;
+    --duration-blink:   1100ms;
+    --duration-shimmer: 1800ms;
+    --duration-float:   3800ms;
+
     /* ── Z-index ── */
     --z-base:    0;
     --z-raised:  10;
@@ -79,15 +86,54 @@
     --z-modal:   200;
     --z-toast:   300;
 
+    /* ── Borders ── */
+    --border-thin:  1px;
+    --border-thick: 2px;
+
+    /* ── Opacity ── */
+    --opacity-disabled: 0.4;
+    --opacity-busy:    0.6;
+    --opacity-pulse-mid: 0.45;
+    --opacity-shimmer: 0.35;
+    --opacity-icon-faint:  0.05;
+    --opacity-icon-soft:   0.10;
+    --opacity-icon-subtle: 0.12;
+    --opacity-icon-medium: 0.18;
+    --opacity-icon-line:   0.70;
+    --opacity-icon-strong: 0.85;
+    --opacity-error-label: 0.65;
+    --opacity-error-prefix: 0.75;
+    --opacity-error-soft:  0.14;
+    --opacity-backdrop-strong: 0.4;
+    --opacity-backdrop-medium: 0.3;
+    --opacity-hover-white:     0.9;
+    --opacity-border-soft:     0.7;
+    --alpha-soft:             0.05;
+    --alpha-medium:           0.07;
+    --alpha-strong:           0.20;
+    --alpha-border:           0.25;
+
+    /* ── Scale (component micro-interactions) ── */
+    --scale-press:  0.98;
+    --scale-enter:  0.94;
+    --scale-leave:  0.97;
+    --scale-pop-1:  1.12;
+    --scale-pop-2:  0.96;
+    --scale-error-1: 0.5;
+    --scale-error-2: 1.15;
+
     /* ── Colors: primitive ── */
     --color-black: #000000;
     --color-white: #FFFFFF;
 
     /* RGB variants (for rgba() usage in components) */
-    --color-accent-rgb:  54, 244, 164;
-    --color-white-rgb:   255, 255, 255;
-    --color-error-rgb:   248, 81, 73;
-    --color-success-rgb: 54, 244, 164;
+    --color-accent-rgb:        54, 244, 164;
+    --color-accent-hover-rgb:  80, 248, 180;
+    --color-accent-active-rgb: 34, 212, 136;
+    --color-white-rgb:         255, 255, 255;
+    --color-black-rgb:         0, 0, 0;
+    --color-error-rgb:         248, 81, 73;
+    --color-success-rgb:       54, 244, 164;
 
     /* ── Colors: backgrounds ── */
     --color-bg:           #000000;
@@ -183,4 +229,96 @@
 
     /* ── Layout ── */
     --titlebar-height: 28px;
+
+    /* App window dimensions (Tauri) */
+    --size-app-width:  720px;
+    --size-app-height: 560px;
+
+    /* Minimum touch target (WCAG AAA) */
+    --size-touch-min: 48px;
+
+    /* Progress bar track height */
+    --size-progress-track: 3px;
+
+    /* Scrollbar thickness */
+    --size-scrollbar: 5px;
+
+    /* Icon sizes */
+    --size-icon-sm:  14px;
+    --size-icon-md:  18px;
+    --size-icon-lg:  24px;
+    --size-icon-xl:  32px;
+    --size-icon-2xl: 48px;
+
+    /* Button padding (asymmetric pill pattern from design system) */
+    --space-button-y:      10px;
+    --space-button-x:      26px;   /* right side */
+    --space-button-x-lead: 20px;   /* left side (asymmetric for icon) */
+    --space-button-ghost-y: 8px;
+    --space-button-ghost-x: 18px;
+
+    /* Badge padding */
+    --space-badge-y: 4px;
+    --space-badge-x: 8px;
+
+    /* Output row padding (file card section) */
+    --space-card-y:     18px;
+    --space-card-y-sm:  14px;
+    --space-card-y-md:  12px;
+    --space-card-x:     20px;
+    --space-card-x-sm:  14px;
+    --space-card-x-md:  10px;
+
+    /* App main padding */
+    --space-app-main:  20px 28px 16px;
+
+    /* Action row / output row custom */
+    --space-list-y:     3px;
+    --space-list-x:     14px;
+    --space-reveal-y:   2px;
+    --space-pct-y:      6px;
+    --space-pct-x:     12px;
+    --space-output-line-y: 7px;
+    --space-output-line-x: 12px;
+
+    /* Split button padding (large primary CTA) */
+    --space-split-y:    10px;
+    --space-split-x-r:  24px;
+    --space-split-x-l:  20px;
+
+    /* Drop zone button padding (compact) */
+    --space-dropzone-btn-y: 9px;
+    --space-dropzone-btn-x-r: 22px;
+    --space-dropzone-btn-x-l: 18px;
+
+    /* Component-specific sizes */
+    --size-app-footer:    28px;
+    --size-titlebar-traffic: 72px;
+    --size-wordmark-max:  90px;
+    --size-dropzone-min:  220px;
+    --size-min-w-130:     130px;
+    --size-min-w-140:     140px;
+    --size-min-w-148:     148px;
+    --size-min-w-360:     360px;
+    --size-min-w-380:     380px;
+    --size-min-w-400:     400px;
+    --size-min-w-pct:     58px;
+    --size-min-w-lineno:  26px;
+    --size-btn-height-sm: 36px;
+    --size-btn-height-md: 40px;
+    --size-btn-height-lg: 42px;
+    --size-btn-compact:   26px;
+    --size-btn-tiny:      22px;
+    --size-icon-dismiss:  28px;
+    --size-icon-status:   24px;
+    --size-icon-result:   32px;
+    --size-dot-sm:        6px;
+    --size-step-dot:      2px;
+    --size-step-dot-radius: 1px;
+    --size-glow-inset:    -80px;
+    --size-pct-min-h:     34px;
+    --size-hint-min-h:    16px;
+    --size-filename-max:  340px;
+    --size-list-max:      200px;
+    --size-glow-ring:     4px;
 }
