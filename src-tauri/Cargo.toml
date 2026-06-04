@@ -31,7 +31,7 @@ tauri-plugin-dialog  = "2.7"
 tauri-plugin-opener  = "2.5"
 
 # PDF processing
-lopdf = "0.40"
+lopdf = "0.41"
 
 # Error handling
 thiserror = "2"
