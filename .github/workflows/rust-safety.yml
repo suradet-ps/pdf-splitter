@@ -67,6 +67,13 @@ jobs:
       # See https://github.com/rust-lang/miri/#filesystem-isolation for
       # the trade-off discussion.
       MIRIFLAGS: -Zmiri-disable-isolation
+      # `lopdf` parses documents in parallel via `rayon`, which in turn
+      # spawns a `crossbeam-epoch`-backed worker pool.  Miri trips on a
+      # benign Stacked-Borrows pattern in `crossbeam-epoch`'s lazy
+      # thread-local init.  Forcing rayon to run inline (single-thread)
+      # sidesteps the pool entirely so Miri never has to validate it.
+      # This does not weaken UB detection in `pdf-split-core` itself.
+      RAYON_NUM_THREADS: 1
     steps:
       - uses: actions/checkout@v6.0.3
 
