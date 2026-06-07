@@ -1,0 +1,78 @@
+name: Rust Safety Check
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  clippy-pedantic:
+    name: Clippy (workspace, pedantic + nursery)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6.0.3
+
+      - name: Install system dependencies (Tauri on Linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+
+      # `tauri::generate_context!()` (invoked indirectly by the Tauri build
+      # script and by `tauri::generate_context!()` in `lib.rs`) embeds the
+      # frontend dist at compile time.  The dist is built in the release
+      # workflow but for clippy we only need a placeholder so the macro
+      # has something to read.
+      - name: Create dist placeholder (required by tauri::generate_context!)
+        run: mkdir -p dist && touch dist/index.html
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Rust Cache
+        uses: swatinem/rust-cache@v2.9.1
+        with:
+          # Cache the workspace-root `target/` directory (set in
+          # `.cargo/config.toml`) so the clippy run is incremental across
+          # CI invocations.
+          workspaces: ". -> target"
+
+      - name: Run clippy with warnings as errors
+        # `--workspace` is essential: we have a Cargo workspace with two
+        # members (`pdf-split-core` and the Tauri app), and we want every
+        # crate linted.
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+  miri-test:
+    name: Miri (${{ matrix.crate }})
+    runs-on: ubuntu-24.04
+    strategy:
+      # `pdf-split-core` is the only Tauri-free, FFI-free, `unsafe`-free
+      # crate in the workspace, so it is the only one miri can validate.
+      # Add more entries here as new pure crates land under `crates/`.
+      fail-fast: false
+      matrix:
+        crate:
+          - pdf-split-core
+    steps:
+      - uses: actions/checkout@v6.0.3
+
+      - name: Install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: miri
+
+      - name: Rust Cache
+        uses: swatinem/rust-cache@v2.9.1
+        with:
+          # Pin the cache to the matrix member so miri's per-crate target
+          # dir doesn't conflict with the clippy job's.
+          workspaces: "crates/${{ matrix.crate }} -> target"
+
+      - name: Miri setup
+        run: cargo +nightly miri setup
+
+      - name: Miri test
+        run: cargo +nightly miri test -p ${{ matrix.crate }}
