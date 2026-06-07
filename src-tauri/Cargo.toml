@@ -45,17 +45,4 @@ serde_json = "1"
 [dev-dependencies]
 tempfile = "3"
 
-# Profile tuning
-
-[profile.release]
-# Optimise aggressively for the shipped macOS binary.
-opt-level     = 3
-lto           = "thin"
-codegen-units = 1
-panic         = "abort"
-
-[profile.dev]
-# Faster incremental builds during development.
-opt-level     = 0
-debug         = true
-incremental   = true
+# Profile tuning has moved to the workspace root `Cargo.toml`.

@@ -1,0 +1,38 @@
+[package]
+name = "pdf-split-core"
+version = "1.0.2"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure-Rust PDF splitting engine. No Tauri, no FFI, no unsafe."
+authors = ["Suradet Pratomsak"]
+license = "MIT"
+repository = "https://github.com/suradet-ps/pdf-splitter"
+readme = "../../README.md"
+
+[lib]
+name = "pdf_split_core"
+path = "src/lib.rs"
+
+[dependencies]
+# PDF processing
+lopdf = "0.41"
+
+# Error handling
+thiserror = "2"
+
+# Serialisation (the splitter produces a JSON-friendly result)
+serde = { version = "1", features = ["derive"] }
+
+# `tempfile` is required by the `test_utils` module, which is `pub` (and
+# `#[doc(hidden)]`) so external test crates can reuse the PDF fixtures.
+# Kept here — not in `dev-dependencies` — because the module is always
+# compiled.
+tempfile = "3"
+
+[dev-dependencies]
+# `serde_json` is only used in the inline `#[cfg(test)]` modules to assert
+# the camelCase serialisation contract of public types.
+serde_json = "1"
+
+[lints]
+workspace = true

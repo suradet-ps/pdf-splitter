@@ -1,5 +1,5 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 # Keep all members in the workspace visible.  New domain crates must be added
 # under `crates/`, the Tauri application stays at `src-tauri/`.
 #
@@ -11,6 +11,22 @@ members = [
     "crates/*",
     "src-tauri",
 ]
+
+# Profile tuning.  Moved here (out of `src-tauri/Cargo.toml`) so it
+# applies to every member crate.  Cargo emits a warning when member
+# crates ship their own profile table, which is why the change was made.
+[profile.release]
+# Optimise aggressively for the shipped binary.
+opt-level     = 3
+lto           = "thin"
+codegen-units = 1
+panic         = "abort"
+
+[profile.dev]
+# Faster incremental builds during development.
+opt-level     = 0
+debug         = true
+incremental   = true
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
