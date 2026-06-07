@@ -696,8 +696,14 @@ mod tests {
     .expect("split");
 
     let json = serde_json::to_string(&result).expect("serialisation failed");
-    assert!(json.contains("\"totalPages\":"), "missing totalPages: {json}");
-    assert!(json.contains("\"outputFiles\":"), "missing outputFiles: {json}");
+    assert!(
+      json.contains("\"totalPages\":"),
+      "missing totalPages: {json}"
+    );
+    assert!(
+      json.contains("\"outputFiles\":"),
+      "missing outputFiles: {json}"
+    );
     assert!(json.contains("\"elapsedMs\":"), "missing elapsedMs: {json}");
   }
 
@@ -711,7 +717,10 @@ mod tests {
     let json = serde_json::to_string(&progress).expect("serialisation failed");
     assert!(json.contains("\"current\":3"), "missing current: {json}");
     assert!(json.contains("\"total\":10"), "missing total: {json}");
-    assert!(json.contains("\"fileName\":\"page_0003.pdf\""), "missing fileName: {json}");
+    assert!(
+      json.contains("\"fileName\":\"page_0003.pdf\""),
+      "missing fileName: {json}"
+    );
   }
 
   #[test]
@@ -743,13 +752,10 @@ mod tests {
     }
 
     for event in &progress_events {
-      let path_in_result = result
-        .output_files
-        .iter()
-        .find(|p| {
-          p.file_name()
-            .is_some_and(|n| n.to_string_lossy().as_ref() == event.file_name.as_str())
-        });
+      let path_in_result = result.output_files.iter().find(|p| {
+        p.file_name()
+          .is_some_and(|n| n.to_string_lossy().as_ref() == event.file_name.as_str())
+      });
       assert!(
         path_in_result.is_some(),
         "progress file name '{}' not found in output_files",

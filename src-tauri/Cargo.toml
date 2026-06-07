@@ -30,10 +30,15 @@ tauri = { version = "2", features = [] }
 tauri-plugin-dialog  = "2.7"
 tauri-plugin-opener  = "2.5"
 
-# PDF processing
-lopdf = "0.41"
+# Pure-Rust PDF splitting engine.  This is the only place where
+# business logic lives.  All PDF parsing/writing is delegated here.
+# Version is pinned explicitly (no `{ workspace = true }`) so this
+# crate remains self-contained.
+pdf-split-core = { path = "../crates/pdf-split-core", version = "1.0.2" }
 
-# Error handling
+# Error handling — `PdfError` is re-exported from `pdf-split-core` but
+# `thiserror` is also kept here in case the Tauri command layer wants to
+# define glue-specific error types in the future.
 thiserror = "2"
 
 # Serialisation (Tauri commands pass data as JSON)
@@ -46,3 +51,6 @@ serde_json = "1"
 tempfile = "3"
 
 # Profile tuning has moved to the workspace root `Cargo.toml`.
+
+[lints]
+workspace = true

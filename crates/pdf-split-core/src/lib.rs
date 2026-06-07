@@ -45,10 +45,10 @@ pub use splitter::{PageProgress, SplitRequest, SplitResult, get_page_count, spli
 /// any time.
 #[doc(hidden)]
 pub mod test_utils {
-use std::fs;
-use std::path::PathBuf;
+  use std::fs;
+  use std::path::PathBuf;
 
-/// Build a minimal but structurally valid PDF with `page_count` blank
+  /// Build a minimal but structurally valid PDF with `page_count` blank
   /// pages using the lopdf API.  Panics on any internal error — this is
   /// intentional in a test context so failures surface as clear panics.
   #[must_use]

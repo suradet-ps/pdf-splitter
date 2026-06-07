@@ -1,20 +1,33 @@
 //! Tauri command handlers — the thin bridge between the renderer and the
-//! PDF processing pipeline.
+//! pure-Rust `pdf_split_core` engine.
+//!
+//! Every command in this file is a near-mechanical wrapper that:
+//!   1. Unpacks a renderer-supplied argument.
+//!   2. Calls into `pdf_split_core`.
+//!   3. Translates the typed `PdfError` (or other) into the JSON shape the
+//!      frontend expects.
+//!
+//! No business logic lives here.  If you find yourself adding a calculation,
+//! a validation rule, or a data transformation, it belongs in
+//! `crates/pdf-split-core/`.
 
 use std::{fs, path::PathBuf};
 
 use tauri::{AppHandle, Emitter, Runtime};
 use tauri_plugin_dialog::FilePath;
 
-use crate::pdf::{self, PageProgress, PdfError, SplitRequest, SplitResult};
+use pdf_split_core::{
+  self, PageProgress, PdfError, SplitRequest, SplitResult, get_page_count as core_get_page_count,
+  split_pdf as core_split_pdf,
+};
 
 // Additional response types
 
 /// Metadata for a PDF file returned by [`get_file_info`].
 ///
-/// Combines page count (from [`pdf::get_page_count`]) and file size (from the
-/// filesystem) into a single round-trip so the frontend avoids two separate
-/// Tauri invocations.
+/// Combines page count (from `pdf_split_core::get_page_count`) and file size
+/// (from the filesystem) into a single round-trip so the frontend avoids
+/// two separate Tauri invocations.
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FileInfo {
@@ -69,7 +82,7 @@ fn file_path_to_string(fp: FilePath) -> String {
 /// Forwards [`PdfError`] for missing files, corrupt PDFs, and empty documents.
 #[tauri::command]
 pub fn get_page_count(path: String) -> Result<u32, PdfError> {
-  pdf::get_page_count(&PathBuf::from(path))
+  core_get_page_count(&PathBuf::from(path))
 }
 
 /// Return both page count and file size for the PDF at `path` in a single
@@ -89,7 +102,7 @@ pub fn get_page_count(path: String) -> Result<u32, PdfError> {
 #[tauri::command]
 pub fn get_file_info(path: String) -> Result<FileInfo, PdfError> {
   let pb = PathBuf::from(path);
-  let page_count = pdf::get_page_count(&pb)?;
+  let page_count = core_get_page_count(&pb)?;
   let size_bytes = fs::metadata(&pb).map_or(0, |m| m.len());
   Ok(FileInfo {
     page_count,
@@ -187,7 +200,7 @@ pub async fn split_pdf<R: Runtime>(
   // individual page processing across all available CPU cores from within
   // that blocking thread.
   let result = tauri::async_runtime::spawn_blocking(move || {
-    pdf::split_pdf(request, move |progress: PageProgress| {
+    core_split_pdf(request, move |progress: PageProgress| {
       // Emit progress event — best-effort; ignore failures (e.g. if the
       // window was closed mid-operation).
       let _ = app_handle.emit(EVENT_SPLIT_PROGRESS, &progress);
@@ -226,6 +239,10 @@ pub async fn reveal_in_finder<R: Runtime>(app: AppHandle<R>, path: String) -> Re
 #[cfg(test)]
 mod tests {
   use super::*;
+  // Re-use the shared test fixtures from the pure-logic crate so we don't
+  // duplicate the lopdf boilerplate.  `test_utils` is `#[doc(hidden)] pub`
+  // and is part of the public API exactly because external tests need it.
+  use pdf_split_core::test_utils::{make_minimal_pdf, write_pdf};
 
   /// `get_page_count` with a non-existent path must return `FileNotFound`.
   #[test]
@@ -255,55 +272,11 @@ mod tests {
     assert_eq!(EVENT_SPLIT_COMPLETE, "split://complete");
   }
 
-  /// Write a minimal PDF to a temporary file and return its path.
-  fn write_test_pdf(dir: &tempfile::TempDir, name: &str, bytes: &[u8]) -> PathBuf {
-    let path = dir.path().join(name);
-    std::fs::write(&path, bytes).expect("test helper: failed to write PDF");
-    path
-  }
-
-  /// Build a minimal 1-page PDF as bytes.
-  fn make_one_page_pdf() -> Vec<u8> {
-    use lopdf::{Document, Object, dictionary};
-
-    let mut doc = Document::with_version("1.7");
-    let pages_id = doc.new_object_id();
-    let page = dictionary! {
-        "Type"      => "Page",
-        "Parent"    => Object::Reference(pages_id),
-        "MediaBox"  => Object::Array(vec![
-            Object::Integer(0),
-            Object::Integer(0),
-            Object::Integer(612),
-            Object::Integer(792),
-        ]),
-    };
-    let page_id = doc.add_object(Object::Dictionary(page));
-    let pages = dictionary! {
-        "Type"  => "Pages",
-        "Kids"  => Object::Array(vec![Object::Reference(page_id)]),
-        "Count" => Object::Integer(1),
-    };
-    doc.objects.insert(pages_id, Object::Dictionary(pages));
-    let catalog = dictionary! {
-        "Type"  => "Catalog",
-        "Pages" => Object::Reference(pages_id),
-    };
-    let catalog_id = doc.add_object(Object::Dictionary(catalog));
-    doc.trailer.set("Root", Object::Reference(catalog_id));
-
-    let mut buf = Vec::new();
-    doc
-      .save_to(&mut buf)
-      .expect("test helper: failed to serialise PDF");
-    buf
-  }
-
   #[test]
   fn should_get_file_info_return_page_count_and_size_bytes() {
     let dir = tempfile::tempdir().expect("tempdir");
-    let pdf_bytes = make_one_page_pdf();
-    let path = write_test_pdf(&dir, "test.pdf", &pdf_bytes);
+    let pdf_bytes = make_minimal_pdf(1);
+    let path = write_pdf(&dir, "test.pdf", &pdf_bytes);
 
     let info = get_file_info(path.to_string_lossy().into_owned()).expect("get_file_info");
 
@@ -318,7 +291,27 @@ mod tests {
       size_bytes: 1024,
     };
     let json = serde_json::to_string(&info).expect("serialisation failed");
-    assert!(json.contains("\"pageCount\":5"), "missing pageCount: {json}");
-    assert!(json.contains("\"sizeBytes\":1024"), "missing sizeBytes: {json}");
+    assert!(
+      json.contains("\"pageCount\":5"),
+      "missing pageCount: {json}"
+    );
+    assert!(
+      json.contains("\"sizeBytes\":1024"),
+      "missing sizeBytes: {json}"
+    );
+  }
+
+  /// Sanity-check the thin wrapper: the command-layer `get_page_count`
+  /// should forward directly to `pdf_split_core::get_page_count` for a
+  /// well-formed input.
+  #[test]
+  fn get_page_count_thin_wrapper_forwards_to_core() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let path = write_pdf(&dir, "src.pdf", &make_minimal_pdf(3));
+
+    let result = get_page_count(path.to_string_lossy().into_owned()).expect("count");
+    let expected = pdf_split_core::get_page_count(&path).expect("core count");
+
+    assert_eq!(result, expected);
   }
 }

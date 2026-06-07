@@ -1,4 +1,10 @@
 //! Tauri application entry point.
+//!
+//! This crate is a **thin wrapper** around the pure-Rust
+//! `pdf_split_core` engine.  No business logic lives here — only the
+//! Tauri command surface, plugin wiring, and window setup.  Any
+//! algorithm, validation rule, or data transformation belongs in
+//! `crates/pdf-split-core/`.
 
 // Enforce a strict, idiomatic Rust style throughout the crate.
 #![deny(
@@ -18,11 +24,8 @@
 
 // module declarations
 
-/// Tauri command handlers (thin wrappers around the `pdf` pipeline).
+/// Tauri command handlers (thin wrappers around `pdf_split_core`).
 pub mod commands;
-
-/// Framework-agnostic PDF processing pipeline.
-pub mod pdf;
 
 // public api
 
