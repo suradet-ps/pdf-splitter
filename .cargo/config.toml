@@ -1,0 +1,16 @@
+# Shared Cargo configuration for the entire workspace.
+#
+# The single `target/` directory keeps incremental rebuilds fast and avoids
+# duplicated build artefacts across member crates.
+
+[build]
+# Use the workspace-root target directory so all crates share incremental
+# build outputs.
+target-dir = "target"
+
+# Treat every warning as an error at the final lint step.  This is the
+# default when running `cargo clippy --all-targets -- -D warnings` but
+# setting it here means developer IDEs inherit the same strict policy.
+rustflags = [
+    "-D", "warnings",
+]

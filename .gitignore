@@ -1,4 +1,6 @@
 # Rust / Cargo
+# Workspace root target directory (shared by all member crates).
+target/
 /target
 src-tauri/target
 _legacy/cli/target

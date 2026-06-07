@@ -1,0 +1,27 @@
+[workspace]
+resolver = "2"
+# Keep all members in the workspace visible.  New domain crates must be added
+# under `crates/`, the Tauri application stays at `src-tauri/`.
+#
+# IMPORTANT: this workspace intentionally avoids `[workspace.package]` and
+# `[workspace.dependencies]`.  Each member crate declares its own dependency
+# versions explicitly so a crate can be lifted out of the workspace and built
+# in isolation without surprises.
+members = [
+    "crates/*",
+    "src-tauri",
+]
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+# Pedantic lints that are too noisy for Tauri glue code.  The pure logic
+# crate can tighten these on a per-file basis with `#[allow(...)]` if needed.
+module_name_repetitions = "allow"
+used_underscore_binding = "allow"

@@ -1,0 +1,20 @@
+# Shared Clippy configuration for the entire workspace.
+#
+# These thresholds apply to every crate.  Individual crates may tighten
+# further with their own `#![deny(...)]` / `#![warn(...)]` attributes.
+
+# A `msrv` here also feeds into Clippy's automatic lint level adjustments.
+msrv = "1.95"
+
+# Cognitive complexity is a useful proxy for "this function is doing too
+# much" — keep it bounded so refactors are forced when functions grow.
+cognitive-complexity-threshold = 25
+
+# Anything that can have a `too_many_*` threshold is set deliberately:
+# - too_many_lines: 200 is plenty for most non-codegen functions.
+# - too_many_arguments: 8 keeps command handler signatures honest.
+too-many-lines-threshold = 200
+too-many-arguments-threshold = 8
+
+# Avoid `Arc<Mutex<...>>` clones in places where the type can be inferred.
+avoid-breaking-exported-api = false
