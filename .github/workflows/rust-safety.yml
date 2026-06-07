@@ -56,6 +56,17 @@ jobs:
       matrix:
         crate:
           - pdf-split-core
+    env:
+      # Several tests in `pdf-split-core` create real on-disk PDFs via
+      # `tempfile::tempdir()` and `std::fs`.  Miri's default filesystem
+      # isolation rejects these syscalls (`mkdir` not available when
+      # isolation is enabled).
+      #
+      # Because this crate is `unsafe`-free, UB / aliasing detection —
+      # miri's primary purpose — is unaffected by disabling isolation.
+      # See https://github.com/rust-lang/miri/#filesystem-isolation for
+      # the trade-off discussion.
+      MIRIFLAGS: -Zmiri-disable-isolation
     steps:
       - uses: actions/checkout@v6.0.3
 
