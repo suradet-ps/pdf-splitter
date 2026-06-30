@@ -328,43 +328,130 @@ mod tests {
   use super::*;
   use std::sync::{Arc, Mutex};
 
-  // Re-export the shared test fixtures so the `mod.rs`-style imports below
-  // read naturally.
+  use rstest::{fixture, rstest};
+
   use crate::test_utils::{
     make_empty_pdf, make_minimal_pdf, make_pdf_with_shared_font, write_bytes, write_pdf,
   };
 
-  #[test]
-  fn get_page_count_returns_error_for_missing_file() {
-    let result = get_page_count(Path::new("/nonexistent/path/file.pdf"));
+  // ---------------------------------------------------------------------------
+  // Fixtures
+  // ---------------------------------------------------------------------------
+
+  /// Shared test context: a temp directory (kept alive), the input path, and
+  /// the output directory.
+  #[derive(Debug)]
+  struct Ctx {
+    _dir: tempfile::TempDir,
+    input: PathBuf,
+    out_dir: PathBuf,
+  }
+
+  /// Create a temp directory with a source PDF of `page_count` pages.
+  #[fixture]
+  fn ctx(#[default(1)] page_count: usize) -> Ctx {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(page_count));
+    let out_dir = dir.path().join("output");
+    Ctx {
+      _dir: dir,
+      input,
+      out_dir,
+    }
+  }
+
+  /// A [`Ctx`] whose input file does not exist on disk.
+  #[fixture]
+  fn ctx_missing() -> Ctx {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let out_dir = dir.path().join("output");
+    Ctx {
+      _dir: dir,
+      input: PathBuf::from("/no/such/file.pdf"),
+      out_dir,
+    }
+  }
+
+  /// A [`Ctx`] whose input is an empty (zero-page) PDF.
+  #[fixture]
+  fn ctx_empty() -> Ctx {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_pdf(&dir, "empty.pdf", &make_empty_pdf());
+    let out_dir = dir.path().join("output");
+    Ctx {
+      _dir: dir,
+      input,
+      out_dir,
+    }
+  }
+
+  /// A [`Ctx`] whose input is corrupt (not a valid PDF).
+  #[fixture]
+  fn ctx_corrupt() -> Ctx {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_bytes(&dir, "corrupt.pdf", b"not a valid PDF at all");
+    let out_dir = dir.path().join("output");
+    Ctx {
+      _dir: dir,
+      input,
+      out_dir,
+    }
+  }
+
+  /// Outcome of a split plus the collected progress events.
+  #[derive(Debug)]
+  struct SplitWithProgress {
+    #[allow(dead_code)]
+    result: SplitResult,
+    events: Vec<PageProgress>,
+  }
+
+  /// Run [`split_pdf`] and collect every [`PageProgress`] event.
+  #[fixture]
+  fn split_with_progress(#[default(1)] page_count: usize) -> SplitWithProgress {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(page_count));
+    let out_dir = dir.path().join("output");
+
+    let events: Arc<Mutex<Vec<PageProgress>>> = Arc::new(Mutex::new(Vec::new()));
+    let log = Arc::clone(&events);
+
+    let result = split_pdf(
+      SplitRequest {
+        input_path: input,
+        output_dir: out_dir,
+      },
+      move |p| {
+        log.lock().expect("mutex poisoned").push(p);
+      },
+    )
+    .expect("split");
+
+    SplitWithProgress {
+      result,
+      events: events.lock().expect("mutex").clone(),
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Error paths
+  // ---------------------------------------------------------------------------
+
+  #[rstest]
+  fn get_page_count_missing_file(ctx_missing: Ctx) {
+    let result = get_page_count(&ctx_missing.input);
     assert!(
       matches!(result, Err(PdfError::FileNotFound { .. })),
       "expected FileNotFound, got: {result:?}"
     );
   }
 
-  #[test]
-  fn get_page_count_single_page() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let path = write_pdf(&dir, "single.pdf", &make_minimal_pdf(1));
-    assert_eq!(get_page_count(&path).expect("count"), 1);
-  }
-
-  #[test]
-  fn get_page_count_multiple_pages() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let path = write_pdf(&dir, "multi.pdf", &make_minimal_pdf(5));
-    assert_eq!(get_page_count(&path).expect("count"), 5);
-  }
-
-  // split_pdf — error paths
-  #[test]
-  fn split_pdf_returns_error_for_missing_input() {
-    let dir = tempfile::tempdir().expect("tempdir");
+  #[rstest]
+  fn split_pdf_missing_input(ctx_missing: Ctx) {
     let result = split_pdf(
       SplitRequest {
-        input_path: PathBuf::from("/no/such/file.pdf"),
-        output_dir: dir.path().to_path_buf(),
+        input_path: ctx_missing.input,
+        output_dir: ctx_missing.out_dir,
       },
       |_| {},
     );
@@ -374,57 +461,123 @@ mod tests {
     );
   }
 
-  // split_pdf — happy path
+  #[rstest]
+  fn get_page_count_empty_pdf(ctx_empty: Ctx) {
+    let result = get_page_count(&ctx_empty.input);
+    assert!(
+      matches!(result, Err(PdfError::NoPages)),
+      "expected NoPages, got: {result:?}"
+    );
+  }
 
-  #[test]
-  fn split_pdf_produces_correct_number_of_files() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(4));
-    let out_dir = dir.path().join("output");
-
+  #[rstest]
+  fn split_pdf_empty_input(ctx_empty: Ctx) {
     let result = split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx_empty.input,
+        output_dir: ctx_empty.out_dir,
+      },
+      |_| {},
+    );
+    assert!(
+      matches!(result, Err(PdfError::NoPages)),
+      "expected NoPages, got: {result:?}"
+    );
+  }
+
+  #[rstest]
+  fn get_page_count_corrupt_file(ctx_corrupt: Ctx) {
+    let result = get_page_count(&ctx_corrupt.input);
+    assert!(
+      matches!(result, Err(PdfError::InvalidPdf(_))),
+      "expected InvalidPdf, got: {result:?}"
+    );
+  }
+
+  #[rstest]
+  fn split_pdf_corrupt_input(ctx_corrupt: Ctx) {
+    let result = split_pdf(
+      SplitRequest {
+        input_path: ctx_corrupt.input,
+        output_dir: ctx_corrupt.out_dir,
+      },
+      |_| {},
+    );
+    assert!(
+      matches!(result, Err(PdfError::InvalidPdf(_))),
+      "expected InvalidPdf, got: {result:?}"
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // get_page_count — happy path
+  // ---------------------------------------------------------------------------
+
+  #[rstest]
+  #[case::single(1)]
+  #[case::multiple(5)]
+  #[trace]
+  fn get_page_count_returns_correct_count(#[case] page_count: usize, #[with(page_count)] ctx: Ctx) {
+    assert_eq!(
+      get_page_count(&ctx.input).expect("count"),
+      u32::try_from(page_count).unwrap()
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // split_pdf — happy path
+  // ---------------------------------------------------------------------------
+
+  #[rstest]
+  #[case::one_page(1)]
+  #[case::four_pages(4)]
+  #[trace]
+  fn split_pdf_produces_correct_number_of_files(
+    #[case] page_count: usize,
+    #[with(page_count)] ctx: Ctx,
+  ) {
+    let result = split_pdf(
+      SplitRequest {
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       |_| {},
     )
     .expect("split should succeed");
 
-    assert_eq!(result.total_pages, 4);
-    assert_eq!(result.output_files.len(), 4);
+    assert_eq!(result.total_pages, u32::try_from(page_count).unwrap());
+    assert_eq!(result.output_files.len(), page_count);
   }
 
-  #[test]
-  fn split_pdf_all_output_files_exist_on_disk() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(3));
-    let out_dir = dir.path().join("out");
-
+  #[rstest]
+  #[case::three_pages(3)]
+  #[case::six_pages(6)]
+  #[trace]
+  fn split_pdf_all_output_files_exist_on_disk(
+    #[case] page_count: usize,
+    #[with(page_count)] ctx: Ctx,
+  ) {
     let result = split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       |_| {},
     )
     .expect("split");
 
+    assert_eq!(result.output_files.len(), page_count);
     for path in &result.output_files {
       assert!(path.exists(), "expected {path:?} to exist on disk");
     }
   }
 
-  #[test]
-  fn split_pdf_output_files_are_sorted() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(6));
-    let out_dir = dir.path().join("sorted");
-
+  #[rstest]
+  fn split_pdf_output_files_are_sorted(ctx: Ctx) {
     let result = split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       |_| {},
     )
@@ -438,16 +591,12 @@ mod tests {
     );
   }
 
-  #[test]
-  fn split_pdf_output_files_have_sequential_names() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(3));
-    let out_dir = dir.path().join("named");
-
+  #[rstest]
+  fn split_pdf_output_files_have_sequential_names(#[with(3)] ctx: Ctx) {
     let result = split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       |_| {},
     )
@@ -465,129 +614,46 @@ mod tests {
     );
   }
 
-  #[test]
-  fn split_pdf_creates_output_dir_if_missing() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(1));
-    // Deeply nested directory that does not exist yet.
-    let out_dir = dir.path().join("a").join("b").join("c");
-
-    assert!(!out_dir.exists(), "pre-condition: dir should not exist yet");
+  #[rstest]
+  fn split_pdf_creates_output_dir_if_missing(#[with(1)] ctx: Ctx) {
+    assert!(
+      !ctx.out_dir.exists(),
+      "pre-condition: dir should not exist yet"
+    );
 
     split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir.clone(),
+        input_path: ctx.input,
+        output_dir: ctx.out_dir.clone(),
       },
       |_| {},
     )
     .expect("split");
 
     assert!(
-      out_dir.exists(),
+      ctx.out_dir.exists(),
       "output directory should have been created"
     );
   }
 
-  // Progress callback
-
-  #[test]
-  fn split_pdf_progress_callback_is_called_for_every_page() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(5));
-    let out_dir = dir.path().join("prog");
-
-    let log: Arc<Mutex<Vec<PageProgress>>> = Arc::new(Mutex::new(Vec::new()));
-    let log_clone = Arc::clone(&log);
-
-    split_pdf(
-      SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
-      },
-      move |p| {
-        log_clone.lock().expect("mutex poisoned").push(p);
-      },
-    )
-    .expect("split");
-
-    let count = log.lock().expect("mutex").len();
-    assert_eq!(count, 5, "callback should be called once per page");
-  }
-
-  #[test]
-  fn split_pdf_progress_total_is_correct() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(4));
-    let out_dir = dir.path().join("total");
-
-    let log: Arc<Mutex<Vec<PageProgress>>> = Arc::new(Mutex::new(Vec::new()));
-    let log_clone = Arc::clone(&log);
-
-    split_pdf(
-      SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
-      },
-      move |p| {
-        log_clone.lock().expect("mutex").push(p);
-      },
-    )
-    .expect("split");
-
-    let events: Vec<PageProgress> = log.lock().expect("mutex").clone();
-    for event in &events {
-      assert_eq!(event.total, 4, "every progress event should report total=4");
-    }
-  }
-
-  #[test]
-  fn split_pdf_progress_current_values_cover_full_range() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(3));
-    let out_dir = dir.path().join("range");
-
-    let log: Arc<Mutex<Vec<u32>>> = Arc::new(Mutex::new(Vec::new()));
-    let log_clone = Arc::clone(&log);
-
-    split_pdf(
-      SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
-      },
-      move |p| {
-        log_clone.lock().expect("mutex").push(p.current);
-      },
-    )
-    .expect("split");
-
-    let currents = log.lock().expect("mutex").clone();
-
-    // Since processing is now sequential, events arrive in order
-    assert_eq!(
-      currents,
-      vec![1, 2, 3],
-      "current values 1..=total must appear in order"
-    );
-  }
-
-  // Output page integrity
-
-  #[test]
-  fn split_pdf_each_output_is_a_single_page_pdf() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(3));
-    let out_dir = dir.path().join("integrity");
-
+  #[rstest]
+  #[case::single_page(1)]
+  #[case::multi_page(3)]
+  #[trace]
+  fn split_pdf_each_output_is_a_single_page_pdf(
+    #[case] page_count: usize,
+    #[with(page_count)] ctx: Ctx,
+  ) {
     let result = split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       |_| {},
     )
     .expect("split");
 
+    assert_eq!(result.output_files.len(), page_count);
     for path in &result.output_files {
       let doc = Document::load(path).expect("output PDF should be loadable");
       assert_eq!(
@@ -598,16 +664,12 @@ mod tests {
     }
   }
 
-  #[test]
-  fn split_result_elapsed_ms_is_accessible() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(2));
-    let out_dir = dir.path().join("elapsed");
-
+  #[rstest]
+  fn split_result_elapsed_ms_is_accessible(ctx: Ctx) {
     let result = split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       |_| {},
     )
@@ -618,94 +680,26 @@ mod tests {
     let _: u64 = result.elapsed_ms;
   }
 
-  #[test]
-  fn should_return_no_pages_when_get_page_count_on_empty_pdf() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let path = write_pdf(&dir, "empty.pdf", &make_empty_pdf());
-    let result = get_page_count(&path);
-    assert!(
-      matches!(result, Err(PdfError::NoPages)),
-      "expected NoPages, got: {result:?}"
-    );
-  }
-
-  #[test]
-  fn should_return_invalid_pdf_when_get_page_count_on_corrupt_file() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let path = write_bytes(&dir, "corrupt.pdf", b"not a valid PDF at all");
-    let result = get_page_count(&path);
-    assert!(
-      matches!(result, Err(PdfError::InvalidPdf(_))),
-      "expected InvalidPdf, got: {result:?}"
-    );
-  }
-
-  #[test]
-  fn should_return_no_pages_when_splitting_empty_pdf() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_empty_pdf());
-    let out_dir = dir.path().join("none");
-
-    let result = split_pdf(
-      SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
-      },
-      |_| {},
-    );
-    assert!(
-      matches!(result, Err(PdfError::NoPages)),
-      "expected NoPages, got: {result:?}"
-    );
-  }
-
-  #[test]
-  fn should_return_invalid_pdf_when_splitting_corrupt_file() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_bytes(&dir, "source.pdf", b"garbage bytes here");
-    let out_dir = dir.path().join("bad");
-
-    let result = split_pdf(
-      SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
-      },
-      |_| {},
-    );
-    assert!(
-      matches!(result, Err(PdfError::InvalidPdf(_))),
-      "expected InvalidPdf, got: {result:?}"
-    );
-  }
-
-  #[test]
-  fn should_succeed_when_output_directory_already_exists() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(2));
-    let out_dir = dir.path().join("exists");
-
-    fs::create_dir_all(&out_dir).expect("pre-create output dir");
+  #[rstest]
+  fn should_succeed_when_output_directory_already_exists(#[with(2)] ctx: Ctx) {
+    fs::create_dir_all(&ctx.out_dir).expect("pre-create output dir");
 
     split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       |_| {},
     )
     .expect("split should succeed when output dir already exists");
   }
 
-  #[test]
-  fn should_serialize_split_result_as_camelcase_json() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(1));
-    let out_dir = dir.path().join("serde");
-
+  #[rstest]
+  fn should_serialize_split_result_as_camelcase_json(#[with(1)] ctx: Ctx) {
     let result = split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       |_| {},
     )
@@ -723,6 +717,66 @@ mod tests {
     assert!(json.contains("\"elapsedMs\":"), "missing elapsedMs: {json}");
   }
 
+  // ---------------------------------------------------------------------------
+  // Progress callback
+  // ---------------------------------------------------------------------------
+
+  #[rstest]
+  #[case::single(1)]
+  #[case::five(5)]
+  #[trace]
+  fn split_pdf_progress_callback_is_called_for_every_page(
+    #[case] page_count: usize,
+    #[with(page_count)] split_with_progress: SplitWithProgress,
+  ) {
+    assert_eq!(
+      split_with_progress.events.len(),
+      page_count,
+      "callback should be called once per page"
+    );
+  }
+
+  #[rstest]
+  #[case::two(2)]
+  #[case::four(4)]
+  #[trace]
+  fn split_pdf_progress_total_is_correct(
+    #[case] expected_total: u32,
+    #[with(expected_total as usize)] split_with_progress: SplitWithProgress,
+  ) {
+    for event in &split_with_progress.events {
+      assert_eq!(
+        event.total, expected_total,
+        "every progress event should report total={expected_total}"
+      );
+    }
+  }
+
+  #[rstest]
+  #[case::three(3, vec![1, 2, 3])]
+  #[case::five(5, vec![1, 2, 3, 4, 5])]
+  #[trace]
+  fn split_pdf_progress_current_values_cover_full_range(
+    #[case] page_count: usize,
+    #[case] expected_currents: Vec<u32>,
+    #[with(page_count)] split_with_progress: SplitWithProgress,
+  ) {
+    let _ = &page_count;
+    let currents: Vec<u32> = split_with_progress
+      .events
+      .iter()
+      .map(|e| e.current)
+      .collect();
+    assert_eq!(
+      currents, expected_currents,
+      "current values 1..=total must appear in order"
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Serialisation
+  // ---------------------------------------------------------------------------
+
   #[test]
   fn should_serialize_page_progress_as_camelcase_json() {
     let progress = PageProgress {
@@ -739,19 +793,19 @@ mod tests {
     );
   }
 
-  #[test]
-  fn should_emit_progress_with_file_names_matching_output() {
-    let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_minimal_pdf(3));
-    let out_dir = dir.path().join("names");
+  // ---------------------------------------------------------------------------
+  // Output file integrity
+  // ---------------------------------------------------------------------------
 
+  #[rstest]
+  fn should_emit_progress_with_file_names_matching_output(#[with(3)] ctx: Ctx) {
     let log: Arc<Mutex<Vec<PageProgress>>> = Arc::new(Mutex::new(Vec::new()));
     let log_clone = Arc::clone(&log);
 
     let result = split_pdf(
       SplitRequest {
-        input_path: input,
-        output_dir: out_dir,
+        input_path: ctx.input,
+        output_dir: ctx.out_dir,
       },
       move |p| {
         log_clone.lock().expect("mutex").push(p);
@@ -780,10 +834,13 @@ mod tests {
     }
   }
 
-  #[test]
-  fn should_preserve_shared_resources_in_output_pages() {
+  #[rstest]
+  #[case::two_pages(2)]
+  #[case::four_pages(4)]
+  #[trace]
+  fn should_preserve_shared_resources_in_output_pages(#[case] page_count: usize) {
     let dir = tempfile::tempdir().expect("tempdir");
-    let input = write_pdf(&dir, "source.pdf", &make_pdf_with_shared_font(2));
+    let input = write_pdf(&dir, "source.pdf", &make_pdf_with_shared_font(page_count));
     let out_dir = dir.path().join("shared");
 
     let result = split_pdf(

@@ -239,33 +239,24 @@ pub async fn reveal_in_finder<R: Runtime>(app: AppHandle<R>, path: String) -> Re
 #[cfg(test)]
 mod tests {
   use super::*;
-  // Re-use the shared test fixtures from the pure-logic crate so we don't
-  // duplicate the lopdf boilerplate.  `test_utils` is `#[doc(hidden)] pub`
-  // and is part of the public API exactly because external tests need it.
   use pdf_split_core::test_utils::{make_minimal_pdf, write_pdf};
+  use rstest::rstest;
 
-  /// `get_page_count` with a non-existent path must return `FileNotFound`.
-  #[test]
-  fn get_page_count_missing_file_returns_error() {
-    let result = get_page_count("/no/such/file.pdf".to_owned());
+  const MISSING: &str = "/no/such/file.pdf";
+
+  #[rstest]
+  #[case::get_page_count(get_page_count(MISSING.to_owned()))]
+  #[case::get_file_info(get_file_info(MISSING.to_owned()))]
+  #[trace]
+  fn missing_file_returns_file_not_found(
+    #[case] result: std::result::Result<impl core::fmt::Debug, PdfError>,
+  ) {
     assert!(
       matches!(result, Err(PdfError::FileNotFound { .. })),
       "expected FileNotFound, got: {result:?}"
     );
   }
 
-  /// `get_file_info` with a non-existent path must return `FileNotFound`.
-  #[test]
-  fn get_file_info_missing_file_returns_error() {
-    let result = get_file_info("/no/such/file.pdf".to_owned());
-    assert!(
-      matches!(result, Err(PdfError::FileNotFound { .. })),
-      "expected FileNotFound, got: {result:?}"
-    );
-  }
-
-  /// Event name constants must stay stable — they are part of the public
-  /// contract between backend and frontend.
   #[test]
   fn event_name_constants_are_stable() {
     assert_eq!(EVENT_SPLIT_PROGRESS, "split://progress");
@@ -301,9 +292,6 @@ mod tests {
     );
   }
 
-  /// Sanity-check the thin wrapper: the command-layer `get_page_count`
-  /// should forward directly to `pdf_split_core::get_page_count` for a
-  /// well-formed input.
   #[test]
   fn get_page_count_thin_wrapper_forwards_to_core() {
     let dir = tempfile::tempdir().expect("tempdir");

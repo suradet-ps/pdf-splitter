@@ -67,25 +67,25 @@ impl From<&str> for PdfError {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use rstest::rstest;
 
-  #[test]
-  fn file_not_found_message() {
-    let err = PdfError::FileNotFound {
-      path: "/tmp/missing.pdf".to_owned(),
-    };
-    assert!(err.to_string().contains("/tmp/missing.pdf"));
+  #[rstest]
+  #[case::file_not_found(PdfError::FileNotFound { path: "/tmp/missing.pdf".to_owned() }, "/tmp/missing.pdf")]
+  #[case::no_pages(PdfError::NoPages, "no pages")]
+  #[case::internal(PdfError::from("boom"), "boom")]
+  #[trace]
+  fn error_message_contains_expected_substring(#[case] err: PdfError, #[case] expected: &str) {
+    assert!(err.to_string().contains(expected));
   }
 
-  #[test]
-  fn no_pages_message() {
-    let err = PdfError::NoPages;
-    assert!(err.to_string().contains("no pages"));
-  }
-
-  #[test]
-  fn internal_from_string() {
-    let err = PdfError::from("boom");
-    assert!(err.to_string().contains("boom"));
+  #[rstest]
+  #[case::file_not_found(PdfError::FileNotFound { path: String::new() }, "FileNotFound")]
+  #[case::no_pages(PdfError::NoPages, "NoPages")]
+  #[case::internal(PdfError::Internal(String::new()), "Internal")]
+  #[case::io(PdfError::Io(std::io::Error::other("")), "Io")]
+  #[trace]
+  fn kind_str_returns_correct_discriminant(#[case] err: PdfError, #[case] expected: &str) {
+    assert_eq!(err.kind_str(), expected);
   }
 
   #[test]
@@ -99,19 +99,6 @@ mod tests {
   }
 
   #[test]
-  fn kind_str_variants() {
-    assert_eq!(
-      PdfError::FileNotFound {
-        path: String::new()
-      }
-      .kind_str(),
-      "FileNotFound"
-    );
-    assert_eq!(PdfError::NoPages.kind_str(), "NoPages");
-    assert_eq!(PdfError::Internal(String::new()).kind_str(), "Internal");
-  }
-
-  #[test]
   fn should_serialize_io_variant_with_kind_and_message() {
     let err = PdfError::Io(std::io::Error::new(
       std::io::ErrorKind::NotFound,
@@ -120,12 +107,6 @@ mod tests {
     let json = serde_json::to_string(&err).expect("serialisation failed");
     assert!(json.contains("\"kind\":\"Io\""), "missing Io kind: {json}");
     assert!(json.contains("\"message\""), "missing message key: {json}");
-  }
-
-  #[test]
-  fn should_return_io_kind_str() {
-    let err = PdfError::Io(std::io::Error::other(""));
-    assert_eq!(err.kind_str(), "Io");
   }
 
   #[test]

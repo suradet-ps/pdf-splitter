@@ -21,18 +21,26 @@ use pdf_split_core::{
   PageProgress, SplitRequest,
   test_utils::{make_minimal_pdf, write_pdf},
 };
+use rstest::rstest;
 
-#[test]
-fn public_api_can_count_pages() {
+#[rstest]
+#[case::count_pages(3)]
+#[case::single_page(1)]
+fn public_api_can_count_pages(#[case] page_count: usize) {
   let dir = tempfile::tempdir().expect("tempdir");
-  let path = write_pdf(&dir, "x.pdf", &make_minimal_pdf(3));
-  assert_eq!(pdf_split_core::get_page_count(&path).expect("count"), 3);
+  let path = write_pdf(&dir, "x.pdf", &make_minimal_pdf(page_count));
+  assert_eq!(
+    pdf_split_core::get_page_count(&path).expect("count"),
+    u32::try_from(page_count).unwrap()
+  );
 }
 
-#[test]
-fn public_api_can_split_pdf() {
+#[rstest]
+#[case::two_pages(2)]
+#[case::four_pages(4)]
+fn public_api_can_split_pdf(#[case] page_count: usize) {
   let dir = tempfile::tempdir().expect("tempdir");
-  let input = write_pdf(&dir, "in.pdf", &make_minimal_pdf(2));
+  let input = write_pdf(&dir, "in.pdf", &make_minimal_pdf(page_count));
   let out_dir = dir.path().join("out");
 
   let result = pdf_split_core::split_pdf(
@@ -44,8 +52,8 @@ fn public_api_can_split_pdf() {
   )
   .expect("split");
 
-  assert_eq!(result.total_pages, 2);
-  assert_eq!(result.output_files.len(), 2);
+  assert_eq!(result.total_pages, u32::try_from(page_count).unwrap());
+  assert_eq!(result.output_files.len(), page_count);
   for p in &result.output_files {
     assert!(p.exists(), "{p:?} should exist on disk");
   }
