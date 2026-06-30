@@ -23,6 +23,7 @@ dist-ssr/
 # Tauri
 # Build output bundles (DMG, app bundle, etc.)
 src-tauri/target/
+src-tauri/gen/
 
 # WiX toolset (Windows – not used here but exclude anyway)
 *.wixobj
