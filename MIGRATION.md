@@ -175,15 +175,21 @@ window.__TAURI_PROMISE__ = import("https://esm.sh/@tauri-apps/api@2")
 
 ❌ **DON'T** (fetch source → `blob:` → `import(blobUrl)` — fails as above).
 
-And widen the Tauri CSP so the cross-origin module is allowed:
+And widen the Tauri CSP so the cross-origin module is allowed. **Critically,
+any WASM/Rust frontend also needs `'wasm-unsafe-eval'` in `script-src`** —
+without it the wasm module cannot instantiate and the app shows a **black
+screen in the Tauri webview** (while plain `trunk serve` works, because no CSP
+applies there):
 
 ```jsonc
-"csp": "…; script-src 'self' 'unsafe-inline' https://esm.sh; …"
+"csp": "default-src 'self' asset:; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://esm.sh; style-src 'self' 'unsafe-inline'; img-src 'self' asset: http://asset.localhost blob: data:; connect-src 'self' ipc: http://ipc.localhost https://esm.sh"
 ```
 
 **Rule of thumb:** in a no-bundler WASM frontend, import npm ESM packages
 *directly* from a CDN that keeps full URLs (esm.sh). If `withGlobalTauri` is
-available, prefer the native global and skip the CDN entirely.
+available, prefer the native global and skip the CDN entirely. And always add
+`'wasm-unsafe-eval'` to `script-src` for a Leptos/Yew/Dioxus frontend — it is
+mandatory for the wasm to run under Tauri's CSP.
 
 ---
 
