@@ -1,0 +1,12 @@
+# Frontend-crate-local Cargo configuration.
+#
+# The pure-logic unit tests (see `src/models.rs`) are annotated with
+# `#[wasm_bindgen_test]` and executed on the `wasm32-unknown-unknown` target.
+# Point Cargo at the `wasm-bindgen-test-runner` (installed via
+# `cargo install wasm-bindgen-cli`) so `cargo test --target wasm32-unknown-unknown`
+# runs them under Node instead of trying to exec the raw `.wasm` binary.
+#
+# This file is merged on top of the workspace-root `.cargo/config.toml`
+# (which supplies the shared `target-dir` and `-D warnings` rustflags).
+[target.wasm32-unknown-unknown]
+runner = "wasm-bindgen-test-runner"

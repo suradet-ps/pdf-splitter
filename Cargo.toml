@@ -12,6 +12,15 @@ members = [
     "src-tauri",
 ]
 
+# The Leptos CSR frontend lives in `src/` and targets `wasm32-unknown-unknown`.
+# Its dependencies (web-sys, wasm-bindgen, leptos) cannot be built for the host
+# target, so it is excluded from the workspace to keep `cargo clippy` /
+# `cargo test` on the host green.  It is built and validated separately with
+# `trunk` (see `src/Trunk.toml`).
+exclude = [
+    "src",
+]
+
 # Profile tuning.  Moved here (out of `src-tauri/Cargo.toml`) so it
 # applies to every member crate.  Cargo emits a warning when member
 # crates ship their own profile table, which is why the change was made.

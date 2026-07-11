@@ -1,0 +1,46 @@
+[package]
+name = "pdf-splitter-frontend"
+version = "1.0.2"
+edition = "2021"
+description = "Leptos CSR frontend for the PDF Splitter Tauri application."
+authors = ["Suradet Pratomsak"]
+license = "MIT"
+repository = "https://github.com/suradet-ps/pdf-splitter"
+
+# The Leptos CSR application is a `cdylib` compiled to `wasm32-unknown-unknown`
+# and bundled by `trunk`.  It is intentionally excluded from the workspace
+# `members` (see the root `Cargo.toml`) because its dependencies only build for
+# the wasm target — including it would break `cargo clippy --workspace` /
+# `cargo test --workspace` on the host.
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+leptos = { version = "0.7", features = ["csr"] }
+
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
+serde_json = "1"
+web-sys = { version = "0.3", features = [
+    "Window",
+    "Event",
+    "MouseEvent",
+    "KeyboardEvent",
+    "DragEvent",
+    "DataTransfer",
+    "File",
+    "FileList",
+    "HtmlElement",
+    "HtmlInputElement",
+] }
+console_error_panic_hook = "0.1"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[profile.release]
+opt-level = "z"
+lto = true

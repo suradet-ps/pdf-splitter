@@ -1,0 +1,20 @@
+# Trunk configuration for the Leptos CSR frontend.
+#
+# The output directory is set to the repository root `dist/` so that Tauri's
+# `frontendDist: "../dist"` (relative to `src-tauri/`) resolves correctly.
+
+[build]
+target = "index.html"
+dist = "../dist"
+# Keep the public URL relative so the app works when loaded from `file://`
+# bundles produced by Tauri.
+public_url = "/"
+# Disable Subresource Integrity (SRI) hashes on the injected <link>/<script>
+# tags.  Tauri's webview (WKWebView on macOS) does not reliably honour the
+# `integrity` attribute when assets are served through the `tauri://` custom
+# protocol, which silently drops the stylesheets and leaves the app unstyled.
+no_sri = true
+
+[serve]
+address = "127.0.0.1"
+port = 1420

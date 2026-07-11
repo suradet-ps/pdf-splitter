@@ -4,9 +4,15 @@
   "version": "1.0.2",
   "identifier": "com.pdfsplitter.app",
   "build": {
-    "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": {
+      "cwd": "../src",
+      "script": "trunk serve"
+    },
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeBuildCommand": {
+      "cwd": "../src",
+      "script": "trunk build"
+    },
     "frontendDist": "../dist"
   },
   "app": {
@@ -23,11 +29,12 @@
         "resizable": false,
         "fullscreen": false,
         "center": true,
-        "decorations": true,
-        "transparent": false,
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
-        "acceptFirstMouse": true
+    "decorations": true,
+    "transparent": false,
+    "titleBarStyle": "Overlay",
+    "hiddenTitle": true,
+    "acceptFirstMouse": true,
+    "withGlobalTauri": true
       }
     ],
     "security": {
