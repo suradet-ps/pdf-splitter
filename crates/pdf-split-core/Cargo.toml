@@ -15,7 +15,7 @@ path = "src/lib.rs"
 
 [dependencies]
 # PDF processing
-lopdf = "0.43"
+lopdf = "0.44.0"
 
 # Error handling
 thiserror = "2"
