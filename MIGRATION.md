@@ -312,6 +312,126 @@ green build under the workspace's strict `-D warnings` policy.
 
 ---
 
+## Runtime Bugs Fixed After the Port
+
+These surfaced only at runtime (in the browser / Tauri webview), not at
+compile time, and are worth recording because the root causes are easy to
+repeat in other Leptos + Tauri projects.
+
+### 1. Tauri global API fails to load from a CDN in a no-bundler setup
+
+The frontend is built by Trunk, which has **no JS bundler**, so the
+`@tauri-apps/api` npm package cannot be `import`ed normally. The original
+approach relied on `withGlobalTauri: true` to inject `window.__TAURI__`
+natively — but **`withGlobalTauri` is rejected by some Tauri v2 configs**, so
+the global must instead be loaded from a CDN at runtime.
+
+The naive loader did:
+
+```js
+const code = await (await fetch("https://cdn.jsdelivr.net/npm/@tauri-apps/api@2/+esm")).text();
+const blobUrl = URL.createObjectURL(new Blob([code], { type: "text/javascript" }));
+const mod = await import(blobUrl);   // ❌ fails
+```
+
+This throws `Module name, '/@tauri-apps/api@2.11.1/es2022/api.mjs' does not
+resolve to a valid URL`. **Why:** both jsdelivr `+esm` and esm.sh rewrite the
+package's internal imports to *absolute* paths
+(`/@tauri-apps/api@2.11.1/es2022/api.mjs`). Those resolve fine against the CDN's
+own origin, but a `blob:` URL has an **opaque origin**, so the absolute path
+cannot be resolved → load failure → `window.__TAURI__` stays `undefined` →
+"Tauri global API is not available" on the first IPC call.
+
+**Fix:** import the package *directly* from esm.sh (no `fetch` + `blob`
+round-trip). The absolute sub-imports then resolve against esm.sh's own origin:
+
+```js
+window.__TAURI_PROMISE__ = import("https://esm.sh/@tauri-apps/api@2")
+  .then((mod) => { window.__TAURI__ = mod; return mod; })
+  .catch((err) => { console.error("Failed to load Tauri global API:", err); throw err; });
+```
+
+And widen the Tauri CSP so the cross-origin module is permitted:
+
+```jsonc
+"csp": "…; script-src 'self' 'unsafe-inline' https://esm.sh; …"
+```
+
+**Takeaway for other projects:** when loading an npm ESM package into a
+no-bundler WASM frontend, import it directly from a CDN that keeps full URLs
+(esm.sh), never via a `blob:` URL. If `withGlobalTauri` is available, prefer
+the native global and skip the CDN entirely.
+
+### 2. `already been disposed` panics when a state-driven view unmounts
+
+The root `App` component renders a different child per `AppState` via a
+re-running closure:
+
+```rust
+let content = move || -> AnyView {
+    match ctx.state.get() {
+        AppState::Idle => view! { <DropZone busy=ctx.is_busy.into() …/> }.into_any(),
+        // …
+    }
+};
+```
+
+`ctx.is_busy.into()` creates a `Signal`. In Leptos, `Signal::from(RwSignal)`
+**registers a new `ArenaItem` owned by the current reactive owner** — here, the
+per-render effect that runs `content`. So every `state` change disposed the
+previous render's `busy` signal. When `DropZone` (still subscribed to `busy`)
+was torn down a frame later, a final read hit the disposed signal and panicked
+with `you tried to access a reactive value … but it has already been disposed`
+(attributed to the signal's creation site in `app.rs`, not the read site).
+
+**Fix:** build every `Signal` prop **once** at the `App` scope (outside the
+re-running closure), so its `ArenaItem` is owned by `App` and lives for the whole
+app lifetime:
+
+```rust
+let busy: Signal<bool> = ctx.is_busy.into();   // created once, at App scope
+// …then inside content:  <DropZone busy=busy …/>
+```
+
+**Takeaway for other projects:** never create a `Signal` / `Memo` / `ReadSignal`
+*inside* a closure that re-runs on reactive updates (a `view!` branch, a
+`Show` `when`/`fallback`, a `content` switch, a `For` `each`). Hoist derived
+values and signal-wrappers to a stable owner, or read with `.get()` (which does
+not create an `ArenaItem`) when you only need a snapshot value.
+
+### 3. `closure invoked recursively or after being dropped`
+
+`requestAnimationFrame` was scheduled with `Closure::once` + `forget()`. If the
+browser ever invokes that closure a second time (or after teardown),
+`Closure::once` panics with `closure invoked recursively or after being dropped`.
+
+**Fix:** use a repeatable `Closure::wrap` guarded by an `Option` so the callback
+runs at most once but a stray second call is a safe no-op:
+
+```rust
+let slot = Rc::new(RefCell::new(Some(Box::new(cb) as Box<dyn FnOnce()>)));
+let closure_slot = slot.clone();
+let closure = Closure::wrap(Box::new(move |_ts: JsValue| {
+    if let Some(cb) = closure_slot.borrow_mut().take() { cb(); }
+}) as Box<dyn FnMut(JsValue)>);
+let _ = win.request_animation_frame(closure.as_ref().unchecked_ref());
+closure.forget();
+```
+
+**Takeaway for other projects:** for fire-once JS callbacks, prefer
+`Closure::wrap` + an `Option`/`Cell` one-shot guard over `Closure::once` when
+the registration can outlive the logical event or be invoked more than once.
+
+### 4. Reactive-tracking warning in async actions
+
+Reading a signal inside an `async fn` (`pick_file`, `start_split`, …) — e.g.
+`if self.is_busy.get()` — fires `you access a reactive value … outside a
+reactive tracking context` because no `Observer` is active during a `Future`.
+These reads are intentionally non-tracking, so use `.get_untracked()` instead of
+`.get()` in async code. This silences the warning and documents intent.
+
+---
+
 ## Testing
 
 Pure-logic helpers in `models.rs` (`shorten_dir`, `default_output_dir`,
