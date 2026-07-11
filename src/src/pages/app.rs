@@ -24,7 +24,6 @@ pub fn App() -> impl IntoView {
   let show_subtitle = ctx.show_subtitle();
   let file_size = ctx.file_size_formatted();
   let output_dir_short = ctx.output_dir_short();
-  let output_dir = ctx.output_dir;
   let elapsed = ctx.elapsed_formatted();
 
   let progress_percent = ctx.progress_percent();
@@ -65,6 +64,26 @@ pub fn App() -> impl IntoView {
       .map_or_else(String::new, |e| e.message.clone())
   });
   let error_kind = Memo::new(move |_| ctx.error.get().map(|e| e.kind));
+
+  // Signal wrappers handed to child components.
+  //
+  // IMPORTANT: building a `Signal` via `.into()` registers an `ArenaItem`
+  // owned by the *current* reactive owner.  These must be created exactly
+  // once here at the `App` scope — never inside the re-running `content`
+  // closure below — otherwise the item is disposed on every `state` change,
+  // and a read that races the teardown of a child view (e.g. `DropZone`
+  // reading `busy`) panics with "already been disposed".
+  let busy: Signal<bool> = ctx.is_busy.into();
+  let file_size_sig: Signal<String> = file_size.into();
+  let output_dir_short_sig: Signal<String> = output_dir_short.into();
+  let output_dir_sig: Signal<String> = ctx.output_dir.into();
+  let elapsed_sig: Signal<String> = elapsed.into();
+  let progress_percent_sig: Signal<i32> = progress_percent.into();
+  let current_sig: Signal<u32> = current.into();
+  let total_sig: Signal<u32> = total.into();
+  let current_file_sig: Signal<String> = current_file.into();
+  let file_name_sig: Signal<String> = file_name.into();
+  let output_files_sig: Signal<Vec<String>> = output_files.into();
 
   // ── Action callbacks ──────────────────────────────────────────────
   let on_pick = Callback::new(move |_| {
@@ -112,7 +131,7 @@ pub fn App() -> impl IntoView {
     match ctx.state.get() {
       AppState::Idle => view! {
           <div class="view view--idle">
-              <DropZone busy=ctx.is_busy.into() on_pick=on_pick on_drop=on_drop/>
+              <DropZone busy=busy on_pick=on_pick on_drop=on_drop/>
           </div>
       }
       .into_any(),
@@ -122,9 +141,9 @@ pub fn App() -> impl IntoView {
               <FileCard
                   file_name=f.name.clone()
                   page_count=f.page_count
-                  file_size_formatted=file_size.into()
-                  output_dir_short=output_dir_short.into()
-                  busy=ctx.is_busy.into()
+                  file_size_formatted=file_size_sig
+                  output_dir_short=output_dir_short_sig
+                  busy=busy
                   on_split=on_split
                   on_change_file=on_change_file
                   on_change_output=on_change_output
@@ -139,11 +158,11 @@ pub fn App() -> impl IntoView {
           <div class="view view--processing">
               <div class="processing-card card">
                   <ProgressView
-                      percent=progress_percent.into()
-                      current=current.into()
-                      total=total.into()
-                      current_file=current_file.into()
-                      file_name=file_name.into()
+                      percent=progress_percent_sig
+                      current=current_sig
+                      total=total_sig
+                      current_file=current_file_sig
+                      file_name=file_name_sig
                   />
               </div>
           </div>
@@ -154,9 +173,9 @@ pub fn App() -> impl IntoView {
               <div class="result-wrapper">
                   <ResultView
                       total_pages=total_pages.get()
-                      output_files=output_files.into()
-                      elapsed_formatted=elapsed.into()
-                      output_dir=output_dir.into()
+                      output_files=output_files_sig
+                      elapsed_formatted=elapsed_sig
+                      output_dir=output_dir_sig
                       on_reveal=on_reveal
                       on_reset=on_reset
                   />

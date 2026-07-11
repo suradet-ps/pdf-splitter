@@ -132,7 +132,7 @@ impl PdfSplitterContext {
   /// Transitions: `idle` / `ready` / `complete` / `error` → `ready`
   /// (a cancelled dialog leaves state unchanged).
   pub async fn pick_file(self) {
-    if self.is_busy.get() {
+    if self.is_busy.get_untracked() {
       return;
     }
     self.is_busy.set(true);
@@ -173,7 +173,7 @@ impl PdfSplitterContext {
   /// Only callable in the `ready` state.  A cancelled dialog keeps the
   /// current value.
   pub async fn pick_output_dir(self) {
-    if self.is_busy.get() || self.state.get() != AppState::Ready {
+    if self.is_busy.get_untracked() || self.state.get_untracked() != AppState::Ready {
       return;
     }
     self.is_busy.set(true);
@@ -191,7 +191,10 @@ impl PdfSplitterContext {
   /// events are buffered and flushed at most once per animation frame to
   /// avoid repainting faster than the display refresh rate.
   pub async fn start_split(self) {
-    if self.is_busy.get() || self.state.get() != AppState::Ready || self.file_info.get().is_none() {
+    if self.is_busy.get_untracked()
+      || self.state.get_untracked() != AppState::Ready
+      || self.file_info.get_untracked().is_none()
+    {
       return;
     }
 
@@ -246,7 +249,7 @@ impl PdfSplitterContext {
 
     let info = self
       .file_info
-      .get()
+      .get_untracked()
       .expect("file_info present (checked above)");
     let split_result = split_pdf(&info.path, &self.output_dir.get()).await;
 
@@ -272,10 +275,10 @@ impl PdfSplitterContext {
       .or_else(|| {
         self
           .result
-          .get()
+          .get_untracked()
           .and_then(|r| r.output_files.into_iter().next())
       })
-      .or_else(|| Some(self.output_dir.get()))
+      .or_else(|| Some(self.output_dir.get_untracked()))
       .unwrap_or_default();
     if target.is_empty() {
       return;

@@ -50,15 +50,10 @@ pub fn DropZone(
       dt.set_drop_effect("copy");
     }
   };
-
   let on_drop = move |ev: DragEvent| {
     ev.prevent_default();
     drag_counter.set_value(0);
     is_drag_over.set(false);
-
-    if busy.get() {
-      return;
-    }
 
     let Some(files) = ev.data_transfer().and_then(|dt| dt.files()) else {
       return;
@@ -79,9 +74,7 @@ pub fn DropZone(
   };
 
   let select = move || {
-    if !busy.get() {
-      on_pick.run(());
-    }
+    on_pick.run(());
   };
 
   view! {

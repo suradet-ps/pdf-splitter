@@ -10,6 +10,46 @@
     </head>
     <body>
         <div id="app"></div>
+
+        <!--
+          Tauri v2 does not inject `window.__TAURI__` on its own — that global
+          object is normally provided by the `@tauri-apps/api` npm package, which
+          we cannot `import` here because the frontend has no JS bundler
+          (it is built by Trunk from Rust/wasm).  Instead we load the API
+          module at *runtime* from a CDN, transmute it to a `blob:` URL, and
+          expose it as `window.__TAURI__` so the Rust frontend's IPC layer
+          (services/tauri.rs, which reads `window.__TAURI__.core` / `.event`)
+          works without any Node/npm tooling.
+
+          The module is executed from a `blob:` URL (same-origin), so the
+          strict `script-src 'self'` CSP still governs execution; only the initial
+          `fetch` needs `connect-src` access to the CDN (see tauri.conf.json).
+        -->
+        <script type="module">
+            // Tauri v2 does not auto-inject `window.__TAURI__` (and
+            // `withGlobalTauri` is unavailable in this project's Tauri config),
+            // so we load the `@tauri-apps/api` npm package at runtime.
+            //
+            // We import it *directly* from esm.sh rather than fetching the
+            // source and re-importing it from a `blob:` URL.  Both esm.sh and
+            // jsdelivr's `+esm` rewrite the package's internal imports to
+            // absolute paths such as
+            // `/@tauri-apps/api@2.11.1/es2022/api.mjs`; those resolve fine
+            // against esm.sh's *own* origin when imported directly, but they
+            // cannot resolve from an opaque `blob:` origin (which produces the
+            // "does not resolve to a valid URL" error).  The `script-src`
+            // directive in tauri.conf.json therefore allows `https://esm.sh`.
+            window.__TAURI_PROMISE__ = import("https://esm.sh/@tauri-apps/api@2")
+                .then((mod) => {
+                    window.__TAURI__ = mod;
+                    return mod;
+                })
+                .catch((err) => {
+                    console.error("Failed to load Tauri global API:", err);
+                    throw err;
+                });
+        </script>
+
         <link data-trunk rel="rust" />
     </body>
 </html>
