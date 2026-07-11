@@ -392,5 +392,5 @@ serve"`, `beforeBuildCommand: "trunk build"`, `devUrl: http://127.0.0.1:1420`,
 - **`assets/styles/main.css`** is an `@import` aggregator kept for parity;
   `index.html` links the three stylesheets directly, so `main.css` is
   unreferenced (harmless).
-- **`AGENTS.md`** still references the removed `bun run` steps and should be
-  updated to the Rust/Trunk commands above.
+- **`AGENTS.md`** has been updated to the Rust/Trunk verification commands
+  (the old `bun run type-check` / `bun run check` steps were removed).

@@ -7,18 +7,9 @@ _legacy/cli/target
 Cargo.lock
 **/*.rs.bk
 
-# Node.js / Bun
-node_modules/
-bun.lockb
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Vite / Build outputs
+# Frontend build output (Trunk → WASM).  The frontend is Rust/Leptos, not
+# Node/Bun/Vite, so no node_modules / lockfiles are expected.
 dist/
-dist-ssr/
-*.local
 
 # Tauri
 # Build output bundles (DMG, app bundle, etc.)

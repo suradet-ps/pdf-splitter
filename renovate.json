@@ -3,12 +3,9 @@
   "extends": [
     "config:recommended"
   ],
-  "bun": {
-    "enabled": true
-  },
   "packageRules": [
     {
-      "matchManagers": ["bun"],
+      "matchManagers": ["cargo"],
       "rangeStrategy": "bump"
     }
   ]

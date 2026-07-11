@@ -13,7 +13,7 @@ This project is a **Cargo workspace** with strict crate boundaries:
 ├── crates/
 │   └── pdf-split-core/        # Pure Rust (NO Tauri dependency)
 ├── src-tauri/                 # Tauri app (thin wrapper only)
-└── src/                       # Vue.js frontend
+└── src/                       # Leptos frontend (Rust → WASM, built with Trunk)
 ```
 
 **Rules of the road** (enforced by `clippy::pedantic` + `clippy::nursery`):
@@ -48,9 +48,14 @@ cargo clippy --workspace --all-targets -- -D warnings
 # Tests (must pass for every member crate)
 cargo test --workspace
 
-# Frontend type-check + biome
-bun run type-check
-bun run check
+# Frontend (Leptos → WASM).  The `src/` crate is excluded from the Cargo
+# workspace (its wasm-only deps would break host builds), so it is validated
+# separately with Trunk.
+cd src
+cargo fmt --check
+cargo clippy --target wasm32-unknown-unknown --all-targets   # -D warnings via .cargo/config
+cargo test  --target wasm32-unknown-unknown                  # wasm-bindgen-test-runner + Node
+trunk build                                                  # emits ../dist
 ```
 
 The pure-logic crate can additionally be run through Miri for extra
