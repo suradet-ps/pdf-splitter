@@ -1,6 +1,6 @@
 [package]
 name = "pdf-splitter"
-version = "1.0.2"
+version = "1.1.0"
 edition = "2024"
 rust-version = "1.95"
 description = "A fast, beautiful macOS desktop app for splitting PDF files into individual pages."
@@ -34,7 +34,7 @@ tauri-plugin-opener  = "2.5"
 # business logic lives.  All PDF parsing/writing is delegated here.
 # Version is pinned explicitly (no `{ workspace = true }`) so this
 # crate remains self-contained.
-pdf-split-core = { path = "../crates/pdf-split-core", version = "1.0.2" }
+pdf-split-core = { path = "../crates/pdf-split-core", version = "1.1.0" }
 
 # Error handling — `PdfError` is re-exported from `pdf-split-core` but
 # `thiserror` is also kept here in case the Tauri command layer wants to
