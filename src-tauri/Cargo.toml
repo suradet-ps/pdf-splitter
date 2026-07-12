@@ -42,7 +42,7 @@ pdf-split-core = { path = "../crates/pdf-split-core", version = "1.1.0" }
 thiserror = "2"
 
 # Serialisation (Tauri commands pass data as JSON)
-serde      = { version = "1", features = ["derive"] }
+serde      = { version = "1.0.228", features = ["derive"] }
 serde_json = "1"
 
 # Dev / test dependencies
