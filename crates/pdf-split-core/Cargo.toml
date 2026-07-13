@@ -32,7 +32,7 @@ tempfile = "3"
 [dev-dependencies]
 # `serde_json` is only used in the inline `#[cfg(test)]` modules to assert
 # the camelCase serialisation contract of public types.
-serde_json = "1"
+serde_json = "1.0.150"
 
 # Fixture-based parametrised testing.
 rstest = "0.26.1"
