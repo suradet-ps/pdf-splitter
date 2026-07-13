@@ -18,13 +18,13 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 # Build dependencies
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "2.6.3", features = [] }
 
 # Runtime dependencies
 
 [dependencies]
 # Tauri core – macOS target only needs the default feature set.
-tauri = { version = "2", features = [] }
+tauri = { version = "2.11.5", features = [] }
 
 # Official Tauri plugins used by the app.
 tauri-plugin-dialog  = "2.7"
