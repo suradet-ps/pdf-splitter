@@ -27,7 +27,7 @@ serde = { version = "1", features = ["derive"] }
 # `#[doc(hidden)]`) so external test crates can reuse the PDF fixtures.
 # Kept here — not in `dev-dependencies` — because the module is always
 # compiled.
-tempfile = "3"
+tempfile = "3.27.0"
 
 [dev-dependencies]
 # `serde_json` is only used in the inline `#[cfg(test)]` modules to assert
