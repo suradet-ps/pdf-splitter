@@ -21,7 +21,7 @@ lopdf = "0.44.0"
 thiserror = "2"
 
 # Serialisation (the splitter produces a JSON-friendly result)
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1.0.228", features = ["derive"] }
 
 # `tempfile` is required by the `test_utils` module, which is `pub` (and
 # `#[doc(hidden)]`) so external test crates can reuse the PDF fixtures.
