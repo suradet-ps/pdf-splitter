@@ -36,7 +36,7 @@ jobs:
           components: clippy
 
       - name: Rust Cache
-        uses: swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        uses: swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           # Cache the workspace-root `target/` directory (set in
           # `.cargo/config.toml`) so the clippy run is incremental across
@@ -72,7 +72,7 @@ jobs:
           components: miri
 
       - name: Rust Cache
-        uses: swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        uses: swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           # Pin the cache to the matrix member so miri's per-crate target
           # dir doesn't conflict with the clippy job's.
