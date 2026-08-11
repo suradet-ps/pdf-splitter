@@ -39,7 +39,7 @@ pdf-split-core = { path = "../crates/pdf-split-core", version = "1.1.0" }
 # Error handling — `PdfError` is re-exported from `pdf-split-core` but
 # `thiserror` is also kept here in case the Tauri command layer wants to
 # define glue-specific error types in the future.
-thiserror = "2.0.19"
+thiserror = "2.0.20"
 
 # Serialisation (Tauri commands pass data as JSON)
 serde      = { version = "1.0.229", features = ["derive"] }
