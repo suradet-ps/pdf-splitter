@@ -1,109 +1,138 @@
 # PDF Splitter
 
-> A fast, beautiful cross-platform desktop app that splits any multi-page PDF into individual page files — built with Tauri 2 and Leptos (Rust → WASM).
-
-![Rust](https://img.shields.io/badge/built_with-Rust-dca282.svg)
-![Tauri](https://img.shields.io/badge/Tauri-2.x-24C8D8.svg)
-![Leptos](https://img.shields.io/badge/Leptos-0.7-de4730.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey.svg)
-
----
-
-## Overview
-
-**PDF Splitter** is a cross-platform (macOS and Windows) desktop application that takes any multi-page PDF document and extracts every page into its own individual PDF file.
-
-The app is built on a native [Tauri 2](https://tauri.app/) shell with a [Leptos 0.7](https://leptos.dev/) UI compiled to WebAssembly via [Trunk](https://trunk-rs.dev/), providing:
-
-- **Native performance** — a lean Rust binary with zero Electron overhead.
-- **Parallel page processing** — automatically scales to all available CPU cores for fast extraction.
-- **Beautiful, native-feel UI** — glassmorphism design, dark-mode support, and smooth animations.
-- **Drag & drop** — drop a PDF straight onto the window to quickly begin splitting.
-- **100% Fidelity** — guarantees perfect quality for fonts, images, and embedded resources.
-
-> The frontend was migrated from Vue 3 + TypeScript + Vite to Leptos + Trunk. See [`MIGRATION.md`](./MIGRATION.md) for the full rationale, procedure, and the runtime gotchas encountered (Tauri global API loading, reactive-signal disposal, CSP for WASM).
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- [Rust + Cargo](https://rustup.rs/) (≥ 1.80) with the `wasm32-unknown-unknown` target:
-  ```bash
-  rustup target add wasm32-unknown-unknown
-  ```
-- [Trunk](https://trunk-rs.dev/) (the WASM web bundler):
-  ```bash
-  cargo install trunk
-  ```
-- **macOS**: Xcode Command Line Tools (`xcode-select --install`)
-- **Windows**: Build Tools for Visual Studio (C++ build tools)
-- *(Optional, only to run the frontend unit tests)* — [Node.js](https://nodejs.org/) and `wasm-bindgen-cli`:
-  ```bash
-  cargo install wasm-bindgen-cli --version 0.2.126
-  ```
-
-### Development
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/suradet-ps/pdf-splitter.git
-cd pdf-splitter
-
-# 2. Start the app (hot-reload for both the Rust backend and the Leptos UI)
-cargo tauri dev
 ```
-
-`cargo tauri dev` runs `trunk serve` for the UI (hot-reload at http://127.0.0.1:1420) and launches the Tauri window.
-
-To iterate on the **frontend only** (no Tauri window), run the Trunk dev server directly:
-
-```bash
-cd src
-trunk serve        # serves the Leptos app at http://127.0.0.1:1420
-```
-
-### Production Build
-
-```bash
-# Build the optimized binary + platform installer (macOS .app/.dmg, Windows .msi/.exe)
-cargo tauri build
-```
-
-The output artifacts are generated in `src-tauri/target/release/bundle/`.
-
-*Note: an automated GitHub Actions workflow (`build-windows.yml`) builds and releases the Windows installer whenever a new `v*` tag is pushed. Its toolchain (Bun-based `tauri` CLI invocation) should be updated to the Cargo-based `cargo tauri build` described above.*
-
----
-
-## Tech Stack
-
-- **Backend**: Rust, Tauri 2, `lopdf` (PDF processing), `rayon` (parallel processing).
-- **Frontend**: [Leptos 0.7](https://leptos.dev/) (client-side rendered), compiled to `wasm32-unknown-unknown` via [Trunk](https://trunk-rs.dev/). No JavaScript/TypeScript/bundler.
-
-### Repository layout
-
-```
-crates/pdf-split-core/   # pure-Rust PDF engine (no Tauri dependency)
-src-tauri/               # Tauri app shell + Rust commands (thin IPC layer)
-src/                     # Leptos frontend crate (excluded from the Cargo workspace;
-                         #   built & tested separately with trunk / wasm-bindgen-test)
-```
-
-The frontend crate is intentionally **excluded from the Cargo workspace** because its `web-sys` / `leptos` dependencies only build for `wasm32`, which would break `cargo clippy --workspace` / `cargo test --workspace` on the host. Validate it separately:
-
-```bash
-cd src
-cargo fmt --check
-cargo clippy --target wasm32-unknown-unknown --all-targets   # -D warnings
-cargo test  --target wasm32-unknown-unknown                  # wasm-bindgen-test-runner + Node
-trunk build                                                # emits ../dist
+██████╗ ██████╗ ███████╗ ██████╗██████╗ ██╗     ██╗████████╗████████╗███████╗██████╗
+██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██║     ██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
+██████╔╝██║  ██║█████╗  ███████╗██████╔╝██║     ██║   ██║      ██║   █████╗  ██████╔╝
+██╔═══╝ ██║  ██║██╔══╝  ╚════██║██╔═══╝ ██║     ██║   ██║      ██║   ██╔══╝  ██╔══██╗
+██║     ██████╔╝██║     ██████╔╝██║     ███████╗██║   ██║      ██║   ███████╗██║  ██║
+╚═╝╚═════╝ ╚═╝╚═════╝╚═╝╚══════╝╚═╝   ╚═╝   ╚═╝╚══════╝╚═╝  ╚═╝
 ```
 
 ---
 
-## License
+## ◆ PULSE
 
-This project is open source and available under the [MIT License](LICENSE).
+A multi-page PDF is a stack of documents wearing one cover. PDF Splitter
+takes it apart - every page extracted into its own PDF file, fonts,
+images, and embedded resources intact, processed in parallel across
+every CPU core. A lean Tauri binary with a WASM Leptos UI: drag the
+file onto the window, and the stack becomes pages. No Electron, no
+JavaScript, no fidelity left on the floor.
+
+| Parallel ▣ | 100% fidelity ▣ | Drag & drop ▣ | Native ▣ |
+|---|---|---|---|
+
+*The split loop - drop, process, save - is sealed.*
+
+> Built with Tauri 2 + Leptos 0.7, split by `lopdf`, parallelized by
+> `rayon` - a Rust engine that never touches a browser.
+>
+> **suradet-ps**, artifact keeper
+
+---
+
+## ◆ IGNITION
+
+One target, one tool, one command.
+
+```
+⟫ rustup target add wasm32-unknown-unknown
+⟫ cargo install trunk
+⟫ cargo tauri dev
+```
+
+UI hot-reloads at [http://127.0.0.1:1420](http://127.0.0.1:1420) while
+the native window runs. Frontend only? `⟫ cd src && trunk serve`.
+
+The release artifact: `⟫ cargo tauri build` - `.app`/`.dmg` on macOS,
+`.msi`/`.exe` on Windows, in `src-tauri/target/release/bundle/`.
+
+<details>
+<summary>Prerequisites</summary>
+
+- [Rust + Cargo](https://rustup.rs/) (>= 1.80) with the
+  `wasm32-unknown-unknown` target
+- [Trunk](https://trunk-rs.dev/) - installed above
+- macOS: Xcode Command Line Tools; Windows: VS C++ build tools
+- Optional (frontend unit tests only): Node.js + `wasm-bindgen-cli`
+
+</details>
+
+---
+
+## ◆ ANATOMY
+
+Three layers, one engine, zero wasted electrons.
+
+- **Splits** - `crates/pdf-split-core` is the pure-Rust PDF engine with
+  no Tauri dependency: page extraction via `lopdf`, fidelity guaranteed
+  for fonts, images, and embedded resources.
+- **Parallelizes** - `rayon` spreads the pages across every available
+  core - a 300-page document becomes 300 parallel jobs, not a
+  patience test.
+- **Carries** - `src-tauri` is a thin IPC layer: commands in, files
+  out, nothing between the engine and the filesystem.
+- **Receives** - the Leptos frontend asks for nothing except the file:
+  drag and drop onto the window, progress on screen, pages on disk.
+- **Wears** - glassmorphism, dark-mode support, and smooth animations -
+  a native-feel surface with a native engine underneath. The design
+  language lives in `DESIGN.md`; the Vue-to-Leptos path in
+  `MIGRATION.md`.
+
+---
+
+## ◆ RITUALS
+
+**The core ceremony** - the stack becomes pages:
+
+1. Drop the PDF onto the window. The app recognizes the offer without
+   a single click-through dialog.
+2. Watch the split: every core takes its pages; the progress reflects
+   the parallelism.
+3. Collect the pages - one PDF per page, every font and image where it
+   belongs.
+4. Send them on their way: one page to one inbox, one page to one
+   folder, one page to one answer.
+
+**The ceremony of fidelity** - nothing is re-rendered and nothing is
+re-encoded through a browser pipeline. The page that comes out carries
+the resources the page went in with - 100 percent, or the split is a
+lie.
+
+**The ceremony of the engine** - the core is pure Rust and testable
+without a window: the split logic lives where the platform cannot
+interfere, and the shell stays thin enough to ignore.
+
+---
+
+## ◆ ECHOES
+
+**Where this artifact is heading**
+
+```
+split     ▸ lopdf page extraction, core crate ──────────────────────── ▸ sealed
+parallel  ▸ rayon across all cores ─────────────────────────────────── ▸ sealed
+deliver   ▸ Tauri bundle: .app/.dmg, .msi/.exe ─────────────────────── ▸ sealed
+receive   ▸ drag & drop, WASM UI on 1420 ───────────────────────────── ▸ sealed
+```
+
+**Raising the artifact** - the conventions live in `AGENTS.md`; the
+design language in `DESIGN.md`; the migration rationale in
+`MIGRATION.md`. Gates: `cargo fmt --check`, clippy with `-D warnings`
+on host and wasm targets, wasm tests via `wasm-bindgen-test`, and the
+Trunk build. Open an issue first to discuss a change.
+
+**Status** - Windows installers build from `v*` tags through the
+[release workflow](.github/workflows/build-windows.yml).
+
+---
+
+```
+  ─────────────────────────────────────────
+   A stack of pages under one cover
+   is still a stack of pages.
+  ─────────────────────────────────────────
+```
+
+Open source under the [MIT License](LICENSE).
