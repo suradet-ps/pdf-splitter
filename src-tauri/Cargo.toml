@@ -28,7 +28,7 @@ tauri = { version = "2.11.5", features = [] }
 
 # Official Tauri plugins used by the app.
 tauri-plugin-dialog  = "2.7.2"
-tauri-plugin-opener  = "2.5.4"
+tauri-plugin-opener  = "2.5.5"
 
 # Pure-Rust PDF splitting engine.  This is the only place where
 # business logic lives.  All PDF parsing/writing is delegated here.
