@@ -1,13 +1,12 @@
 # PDF Splitter
 
-```
-██████╗ ██████╗ ███████╗███████╗██████╗ ██╗     ██╗████████╗████████╗███████╗██████╗ 
-██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██║     ██║╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
-██████╔╝██║  ██║█████╗  ███████╗██████╔╝██║     ██║   ██║      ██║   █████╗  ██████╔╝
-██╔═══╝ ██║  ██║██╔══╝  ╚════██║██╔═══╝ ██║     ██║   ██║      ██║   ██╔══╝  ██╔══██╗
-██║     ██████╔╝██║     ███████║██║     ███████╗██║   ██║      ██║   ███████╗██║  ██║
-╚═╝     ╚═════╝ ╚═╝     ╚══════╝╚═╝     ╚══════╝╚═╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
-```
+[![Rust Safety](https://github.com/suradet-ps/pdf-splitter/actions/workflows/rust-safety.yml/badge.svg)](https://github.com/suradet-ps/pdf-splitter/actions/workflows/rust-safety.yml)
+[![Release](https://github.com/suradet-ps/pdf-splitter/actions/workflows/release.yml/badge.svg)](https://github.com/suradet-ps/pdf-splitter/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Rust: stable](https://img.shields.io/badge/rust-stable-orange.svg?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Tauri v2](https://img.shields.io/badge/Tauri-v2-24c8db.svg?logo=tauri&logoColor=white)](https://tauri.app/)
+[![Leptos v0.8](https://img.shields.io/badge/Leptos-v0.8-blue.svg)](https://leptos.dev)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/suradet-ps/pdf-splitter/issues)
 
 ---
 
@@ -25,7 +24,7 @@ JavaScript, no fidelity left on the floor.
 
 *The split loop - drop, process, save - is sealed.*
 
-> Built with Tauri 2 + Leptos 0.7, split by `lopdf`, parallelized by
+> Built with Tauri 2 + Leptos 0.8, split by `lopdf`, parallelized by
 > `rayon` - a Rust engine that never touches a browser.
 >
 > **suradet-ps**, artifact keeper
@@ -124,7 +123,7 @@ on host and wasm targets, wasm tests via `wasm-bindgen-test`, and the
 Trunk build. Open an issue first to discuss a change.
 
 **Status** - Windows installers build from `v*` tags through the
-[release workflow](.github/workflows/build-windows.yml).
+[release workflow](.github/workflows/release.yml).
 
 ---
 
