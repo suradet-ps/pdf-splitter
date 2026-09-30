@@ -18,7 +18,7 @@ path = "src/lib.rs"
 lopdf = "0.45.0"
 
 # Error handling
-thiserror = "2.0.20"
+thiserror = "2.0.21"
 
 # Serialisation (the splitter produces a JSON-friendly result)
 serde = { version = "1.0.229", features = ["derive"] }
