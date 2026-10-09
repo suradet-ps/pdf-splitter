@@ -24,7 +24,7 @@ tauri-build = { version = "2.7.1", features = [] }
 
 [dependencies]
 # Tauri core – macOS target only needs the default feature set.
-tauri = { version = "2.12.1", features = [] }
+tauri = { version = "2.12.2", features = [] }
 
 # Official Tauri plugins used by the app.
 tauri-plugin-dialog  = "2.8.1"
