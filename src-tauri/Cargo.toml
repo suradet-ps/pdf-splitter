@@ -43,7 +43,7 @@ thiserror = "2.0.21"
 
 # Serialisation (Tauri commands pass data as JSON)
 serde      = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.151"
+serde_json = "1.0.152"
 
 # Dev / test dependencies
 
